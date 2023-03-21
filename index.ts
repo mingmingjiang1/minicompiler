@@ -19,9 +19,6 @@ export enum Token {
   KeywordToken = 3,
 }
 
-function isSplitToken(s: string): boolean {
-  return ["{", "}", "(", ")", ";"].includes(s);
-}
 
 let matches: any[] = [];
 
