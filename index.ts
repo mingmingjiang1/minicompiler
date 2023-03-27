@@ -287,35 +287,8 @@ class Parser {
         while (tmp) {
           this.stack.shift();
           const cur = symStack.shift();
-          matches.unshift(cur);
+          matches.unshift(cur); // 全局变量，匹配匹配的字符，理想上设置成$$, $1, $2, ...,
           tmp--;
-          switch (production.lfh + "->" + production.rfh) {
-            case ProductionEnummap[11]: // +运算
-              // 四则运算 A->A+C, A->A*C
-              break;
-            case ProductionEnummap[12]: // *运算
-              break;
-            case ProductionEnummap[14]:
-              // 常量
-              break;
-            case ProductionEnummap[15]:
-              break;
-            case ProductionEnummap[10]:
-              break;
-            case ProductionEnummap[5]:
-              break;
-            case ProductionEnummap[9]:
-              break;
-            case ProductionEnummap[4]:
-              break;
-            case ProductionEnummap[3]:
-              if (cur instanceof Formal_Class) {
-                console.log(cur);
-              }
-              // make func class
-              // pop stack组装
-              break;
-          }
         }
         console.log(matches, "matches", production.rfh);
         switch (production.lfh + "->" + production.rfh) {
