@@ -1,13 +1,16 @@
 {
-  "name": "icompiler",
+  "name": "mccompiler",
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "start": "",
+    "compile": "ts-node src/semantic/index.ts",
+    "mc": "spim -file src/assemble/genAss.s"
   },
-  "author": "",
+  "author": "life2die",
   "license": "ISC",
-  "description": "",
+  "description": "an mini compiler for c-like language",
   "dependencies": {
     "@types/node": "^18.13.0",
     "chalk": "^4.1.2",
