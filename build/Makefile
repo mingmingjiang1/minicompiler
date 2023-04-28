@@ -47,7 +47,6 @@ CXXFLAGS.target ?= $(CPPFLAGS) $(CXXFLAGS)
 LINK.target ?= $(LINK)
 LDFLAGS.target ?= $(LDFLAGS)
 AR.target ?= $(AR)
-PLI.target ?= pli
 
 # C++ apps need to be linked with g++.
 LINK ?= $(CXX.target)
@@ -59,9 +58,8 @@ CFLAGS.host ?= $(CPPFLAGS_host) $(CFLAGS_host)
 CXX.host ?= g++
 CXXFLAGS.host ?= $(CPPFLAGS_host) $(CXXFLAGS_host)
 LINK.host ?= $(CXX.host)
-LDFLAGS.host ?= $(LDFLAGS_host)
+LDFLAGS.host ?=
 AR.host ?= ar
-PLI.host ?= pli
 
 # Define a dir function that can handle spaces.
 # http://www.gnu.org/software/make/manual/make.html#Syntax-of-Functions
@@ -123,10 +121,10 @@ endef
 # - quiet_cmd_foo is the brief-output summary of the command.
 
 quiet_cmd_cc = CC($(TOOLSET)) $@
-cmd_cc = $(CC.$(TOOLSET)) -o $@ $< $(GYP_CFLAGS) $(DEPFLAGS) $(CFLAGS.$(TOOLSET)) -c
+cmd_cc = $(CC.$(TOOLSET)) $(GYP_CFLAGS) $(DEPFLAGS) $(CFLAGS.$(TOOLSET)) -c -o $@ $<
 
 quiet_cmd_cxx = CXX($(TOOLSET)) $@
-cmd_cxx = $(CXX.$(TOOLSET)) -o $@ $< $(GYP_CXXFLAGS) $(DEPFLAGS) $(CXXFLAGS.$(TOOLSET)) -c
+cmd_cxx = $(CXX.$(TOOLSET)) $(GYP_CXXFLAGS) $(DEPFLAGS) $(CXXFLAGS.$(TOOLSET)) -c -o $@ $<
 
 quiet_cmd_objc = CXX($(TOOLSET)) $@
 cmd_objc = $(CC.$(TOOLSET)) $(GYP_OBJCFLAGS) $(DEPFLAGS) -c -o $@ $<
@@ -161,10 +159,7 @@ cmd_touch = touch $@
 
 quiet_cmd_copy = COPY $@
 # send stderr to /dev/null to ignore messages when linking directories.
-cmd_copy = ln -f "$<" "$@" 2>/dev/null || (rm -rf "$@" && cp -af "$<" "$@")
-
-quiet_cmd_symlink = SYMLINK $@
-cmd_symlink = ln -sf "$<" "$@"
+cmd_copy = rm -rf "$@" && cp -af "$<" "$@"
 
 quiet_cmd_alink = LIBTOOL-STATIC $@
 cmd_alink = rm -f $@ && ./gyp-mac-tool filter-libtool libtool $(GYP_LIBTOOLFLAGS) -static -o $@ $(filter %.o,$^)
@@ -331,8 +326,8 @@ ifeq ($(strip $(foreach prefix,$(NO_LOAD),\
 endif
 
 quiet_cmd_regen_makefile = ACTION Regenerating $@
-cmd_regen_makefile = cd $(srcdir); /Users/bytedance/.nvm/versions/node/v14.20.0/lib/node_modules/node-gyp/gyp/gyp_main.py -fmake --ignore-environment "-Dlibrary=shared_library" "-Dvisibility=default" "-Dnode_root_dir=/Users/bytedance/Library/Caches/node-gyp/14.20.0" "-Dnode_gyp_dir=/Users/bytedance/.nvm/versions/node/v14.20.0/lib/node_modules/node-gyp" "-Dnode_lib_file=/Users/bytedance/Library/Caches/node-gyp/14.20.0/<(target_arch)/node.lib" "-Dmodule_root_dir=/Users/bytedance/Desktop/icompiler" "-Dnode_engine=v8" "--depth=." "-Goutput_dir=." "--generator-output=build" -I/Users/bytedance/Desktop/icompiler/build/config.gypi -I/Users/bytedance/.nvm/versions/node/v14.20.0/lib/node_modules/node-gyp/addon.gypi -I/Users/bytedance/Library/Caches/node-gyp/14.20.0/include/node/common.gypi "--toplevel-dir=." binding.gyp
-Makefile: $(srcdir)/../../Library/Caches/node-gyp/14.20.0/include/node/common.gypi $(srcdir)/binding.gyp $(srcdir)/build/config.gypi $(srcdir)/../../.nvm/versions/node/v14.20.0/lib/node_modules/node-gyp/addon.gypi
+cmd_regen_makefile = cd $(srcdir); /Users/bytedance/.nvm/versions/node/v14.20.0/lib/node_modules/npm/node_modules/node-gyp/gyp/gyp_main.py -fmake --ignore-environment "-Dlibrary=shared_library" "-Dvisibility=default" "-Dnode_root_dir=/Users/bytedance/Library/Caches/node-gyp/14.20.0" "-Dnode_gyp_dir=/Users/bytedance/.nvm/versions/node/v14.20.0/lib/node_modules/npm/node_modules/node-gyp" "-Dnode_lib_file=/Users/bytedance/Library/Caches/node-gyp/14.20.0/<(target_arch)/node.lib" "-Dmodule_root_dir=/Users/bytedance/Desktop/icompiler" "-Dnode_engine=v8" "--depth=." "-Goutput_dir=." "--generator-output=build" -I/Users/bytedance/Desktop/icompiler/build/config.gypi -I/Users/bytedance/.nvm/versions/node/v14.20.0/lib/node_modules/npm/node_modules/node-gyp/addon.gypi -I/Users/bytedance/Library/Caches/node-gyp/14.20.0/include/node/common.gypi "--toplevel-dir=." binding.gyp
+Makefile: $(srcdir)/../../.nvm/versions/node/v14.20.0/lib/node_modules/npm/node_modules/node-gyp/addon.gypi $(srcdir)/../../Library/Caches/node-gyp/14.20.0/include/node/common.gypi $(srcdir)/binding.gyp $(srcdir)/build/config.gypi
 	$(call do_cmd,regen_makefile)
 
 # "all" is a concatenation of the "all" targets from all the included

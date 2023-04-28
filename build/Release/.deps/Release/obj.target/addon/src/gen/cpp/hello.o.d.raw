@@ -1,9 +1,0 @@
-Release/obj.target/addon/src/gen/cpp/hello.o: ../src/gen/cpp/hello.cc \
-  /Users/bytedance/Library/Caches/node-gyp/14.20.0/include/node/node.h \
-  /Users/bytedance/Library/Caches/node-gyp/14.20.0/include/node/v8.h \
-  /Users/bytedance/Library/Caches/node-gyp/14.20.0/include/node/cppgc/common.h \
-  /Users/bytedance/Library/Caches/node-gyp/14.20.0/include/node/v8config.h \
-  /Users/bytedance/Library/Caches/node-gyp/14.20.0/include/node/v8-internal.h \
-  /Users/bytedance/Library/Caches/node-gyp/14.20.0/include/node/v8-version.h \
-  /Users/bytedance/Library/Caches/node-gyp/14.20.0/include/node/v8-platform.h \
-  /Users/bytedance/Library/Caches/node-gyp/14.20.0/include/node/node_version.h

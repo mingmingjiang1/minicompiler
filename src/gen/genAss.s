@@ -36,9 +36,15 @@ li $v0, 1
 syscall
 
 #return语句上面一句
-addiu $29, $29, 4 #把return后面的局部变量全部pop
+addiu $29, $29, 4 #把return后面的局部变量全部pop(Yes)
 
 lw $31, 4($29) #读取返回地址
 addiu $29, $29, -4 #stack pop
 lw $30, 0($29) # ？？？，最后应该根据old fp重新更新fp寄存器？并且清空参数和return addr(直接重置sp => )
 jr $31
+
+
+int test(int y) {
+  int x = 3
+  return x - y;
+}

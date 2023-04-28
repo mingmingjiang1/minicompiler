@@ -1,65 +1,12 @@
-/* 
-DFA
-target：
-写一个NFA->DFA,看情况只会写一个DFA也可以
-输入: 字符流
-eg:
-int test() {
-  int x = m + n;
-  return x;
-}
-
-[type \s Identifier ( ) { \n \t Identifier \s Identifier \s + \s Identifier ; \n \t ]
-
-输出：Token流
-
-Token类
-
-[
-  {
-    value: 原始值
-    token: 类型
-  }
-]
-*/
-
-import { atoi, error, idCnt, success } from "./src/utils";
-import { readToken } from "./src/nfa/node";
-import { TOKEN, TOKENMAP, TOKENMAP2 } from "./type";
+import { atoi, error, idCnt, success } from "../../src/utils";
+import { readToken } from "./nfa";
+import { TOKEN } from "../type";
 const chalk = require('chalk');
+const fs = require("fs");
 
 let yytext = '', yylength = 0, number_line = 1;
 
-
-/** 0-9a-zA-Z'' */
-// const edges = new Array(20).fill(0).map((item) => {
-//   return new Array(75).fill(0);
-// });
-
-// edges[0][1] = atoi('i');
-// edges[0][3] = null;
-// edges[0][8] = null;
-// edges[8][9] = idCnt('0', '9');
-
-// edges[9][12] = null;
-// edges[12][10] = null;
-// edges[10][11] = idCnt('0', '9');
-
-// edges[11][12] = null;
-
-// edges[0][13] = null;
-// edges[1][2] = atoi('f');
-// // edges1[2][18] = 1;
-// edges[3][4] = idCnt('a', 'z');
-// edges[4][7] = null;
-// edges[7][5] = null;
-// edges[5][6] = [...idCnt('0', '9'), ...idCnt('a', 'z')];
-// edges[6][7] = null;
-
-// edges[13][14] = idCnt(':', '`'); // idCnt(':', '`')
-
-const [edges, endStates] = readToken("./flex.p");
-console.log(endStates, 99999);
+const [edges, endStates] = readToken('./src/flex.p');
 
 // get target state node from source node state by edge c
 // 入参是某个节点
@@ -83,55 +30,6 @@ function getEndofEdges(state: number, c: number | null) {
 }
 
 success('get union NFA start nodes: ', getClosure([0], null));
-
-
-// 所以edges得先确定
-
-// epsilon closure
-// 入参是节点状态集合
-
-const leafs: (TOKEN | boolean)[] = [
-  false,
-  false,
-  TOKEN.IF,
-  false,
-  false,
-  TOKEN.TYPE,
-  false,
-  false,
-  false,
-  false,
-  false,
-  TOKEN.KEYWORD,
-  false,
-  false,
-  false,
-  false,
-  TOKEN.ID,
-  false,
-  false,
-  false,
-  // false,
-  TOKEN.NUM,
-  false,
-  TOKEN.ERROR,
-  false,
-  TOKEN.WHITE,
-  true,
-  true,
-  true,
-  true,
-  true,
-  true,
-  true,
-  // TOKEN.LEFTBIG,
-  // TOKEN.RIGHTBIG,
-  // TOKEN.LEFTPARENT,
-  // TOKEN.RIGHTPARENT,
-  // TOKEN.SEMICOLON,
-  // TOKEN.COMMA,
-  // TOKEN.TYPE,
-];
 
 export function getClosure(S: number[], c: number | null) {
   const queue = [...S];
@@ -159,15 +57,15 @@ export function DFAedge(states: number[], c: number) {
 
 // spec test
 
-// console.log(111, DFAedge([0, 3, 13, 8], atoi('i'))); // [ 1, 4, 7, 5 ]
-// console.log(DFAedge([0, 3, 13, 8], atoi('g'))); // [ 4, 7, 5 ]
-// console.log(DFAedge([ 1, 4, 14, 7, 5 ], atoi('f'))); // [ 2, 6, 7, 5 ]
-// console.log(DFAedge([ 1, 4, 14, 7, 5 ], atoi('z'))); // [ 6, 7, 5 ]
-// console.log(DFAedge([ 1, 4, 14, 7, 5 ], atoi('0'))); // [ 6, 7, 5 ]
-// console.log(DFAedge([9, 10, 12, 14], atoi('0'))); // [ 11, 12, 10 ]
-// console.log(DFAedge([0, 3, 13, 8], atoi('`'))); // [14]
-// console.log(atoi(' '), DFAedge([0, 3, 8, 13], atoi(' '))); // [15]
-// console.log(DFAedge([0, 3, 8, 13], atoi('{'))); // [16]
+console.log(111, DFAedge([1, 4, 14, 9], atoi('i'))); // [ 2, 5, 8, 6 ]
+console.log(DFAedge([1, 4, 14, 9], atoi('g'))); // [ 5, 8, 6 ]
+console.log(DFAedge([2, 5, 15, 8, 6], atoi('f'))); // [ 3, 7, 8, 6 ]
+console.log(DFAedge([2, 5, 15, 8, 6], atoi('z'))); // [ 7, 8, 6 ]
+console.log(DFAedge([2, 5, 15, 8, 6], atoi('0'))); // [ 7, 8, 6 ]
+console.log(DFAedge([10, 11, 13, 15], atoi('0'))); // [ 12, 13, 11 ]
+console.log(DFAedge([1, 4, 14, 9], atoi('`'))); // [15]
+// console.log(atoi(' '), DFAedge([1, 4, 9, 14], atoi(' '))); // [15]
+// console.log(DFAedge([1, 4, 9, 14], atoi('{'))); // [16]
 
 // NFA模拟算法
 // function getNFA(initState: number[], k: number, chars: number[]) {
@@ -248,9 +146,8 @@ function NFA2DFA(alpabets: number[], initState: number[]) {
 }
 
 // const trans = NFA2DFA(idCnt('\x00', '\x80'), [0, 3, 8, 13]);
-const trans = NFA2DFA([...idCnt('0', 'z'), atoi(' '), atoi('\n'), atoi('\t'), atoi('{'), atoi('}'), atoi('('), atoi(')'), atoi(','), atoi(';')], getClosure([0], null))
+const trans = NFA2DFA([...idCnt('0', 'z'), atoi(' '), atoi('\n'), atoi('\t'), atoi('{'), atoi('}'), atoi('('), atoi(')'), atoi(','), atoi('-'), atoi('+'), atoi('*'), atoi('/')], getClosure([1], null))
 // // 后续在生成dfa的时候，如果存在叶子节点，且可能是多个nfa的叶子节点，需要优先级判断，以第一个nfa为基准
-
 export function scan(input: string) {
   let startState: {
     path?: number[];
@@ -259,34 +156,43 @@ export function scan(input: string) {
     key?: number;
   } = {
     // path: ,
-    ind: getClosure([0], null),
+    ind: getClosure([1], null),
     isEnd: false,
     key: 1,
   };
   const path: string[] = []; // 存储原始字符
-  const tokens: [number, string, string][] = []; // 存储token
-  let preState;
+  const tokens: [number, TOKEN | string, string][] = []; // 存储token
+  let preState: {
+    path?: number[];
+    isEnd?: boolean;
+    ind?: number[];
+    key?: number;
+  };
   let i  = 0;
   while (i < input.length) {
     let code: number;
     code = atoi(input[i]);
     // 特殊判断
-    // console.log(startState, input[i])
     preState = startState;
     startState = trans[startState?.key][code];
     if(!startState || !trans[startState?.key]?.[code]) {
-      const target = preState.ind.find((item) => endStates.some(state => state.index === item));
+      const target = endStates.find(item => preState.ind.some(index => index === item.index));
       // console.log(endStates.find(state => state.index === target), `() => ${endStates.find(state => state.index === target).action}`)
-      console.log(target, preState)
       // console.log(eval(`() => ${endStates.find(state => state.index === target).action}`)());
-      error('该节点不存在对应输入的出边，上一个状态key%s，第%s个字符，%s： ', preState.key, i, input[i], code);
-      console.log(chalk.blue('可能该节点是叶子节点，也有可能是该节点确实是个死胡同'));
+      // error('该节点不存在对应输入的出边，上一个状态key%s，第%s个字符，%s： ', preState.key, i, input[i], code);
+      // console.log(chalk.blue('可能该节点是叶子节点，也有可能是该节点确实是个死胡同'));
       if (target) {
-        console.log(input[i-1], TOKENMAP[leafs[target] as TOKEN], target)
-        tokens.push(TOKENMAP[leafs[target] as TOKEN] === undefined ? [number_line, '', input[i-1]] : [number_line, TOKENMAP[leafs[target] as TOKEN], yytext]);
+        if (target.action(yytext, TOKEN) === undefined) {
+          throw new Error(`the type from action ${target.action} is error: ${yytext}`);
+        }
+        if (yytext === '?') {
+          console.log(target.action(yytext, TOKEN), yytext)
+        }
+        tokens.push([number_line, target.action(yytext, TOKEN), yytext])
+        // tokens.push(TOKENMAP[leafs[target] as TOKEN] === undefined ? [number_line, '', input[i-1]] : [number_line, TOKENMAP[leafs[target] as TOKEN], yytext]);
       } 
       startState = {
-        ind: getClosure([0], null),
+        ind: getClosure([1], null),
         isEnd: false,
         key: 1,
       };
@@ -295,26 +201,21 @@ export function scan(input: string) {
     }
     yylength += 1, yytext += input[i];
     if (input[i] === '\n') {
-      console.log(input[i], i, 777777)
       number_line += 1;
     }
     i += 1;
   }
-  console.log(startState.ind, endStates)
-  const target = startState.ind.find((item) => endStates.some(state => state.index === item));
+  const target = endStates.find(item => startState.ind.some(index => index === item.index));
   if (target) {
-    tokens.push(TOKENMAP[leafs[target] as TOKEN] === undefined ? [number_line, '', input[i-1]] : [number_line, TOKENMAP[leafs[target] as TOKEN], input[i-1]]);
+    tokens.push([number_line, target.action(yytext, TOKEN), yytext])
   } else {
     throw new Error(`Uncaught SyntaxError: Unexpected token ${input[i-1]}`);
   }
-  console.log(999999, tokens);
-  success("tokens stream: ", tokens.filter(item => item[1] !== 'WHITE').map(item => TOKENMAP2[item[1]] === undefined ? item : TOKENMAP2[item[1]]));
-  return tokens.filter(item => item[1] !== 'WHITE').map(item => TOKENMAP2[item[1]] === undefined ? item : TOKENMAP2[item[1]]);
+
+  console.log("tokens stream: ", tokens.filter(item => item[1] !== TOKEN.WHITE));
+  return tokens.filter(item => item[1] !== TOKEN.WHITE);
 }
 
-scan(` int test(int x, int y) { 
-        return x;
-      }`);
 
 function isExisted(
   src: number[],
@@ -333,17 +234,4 @@ function isExisted(
     res,
   ];
 }
-
-/* 
-trans[startState][char] = nextState;
-应该定制一些基本的dfa，如：
-+
-*
-?
-然后联合形成一个大的NFA，
-然后得到大的NFA的edges
-基于edges获取closure转换成dfa
-还需要考虑的事情：
-为了方便使用，需要留有yyval和yytext保留词素,在action里执行，生成token对象，包含yyval属性，
-*/
 

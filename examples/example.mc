@@ -1,6 +1,18 @@
-int sub1(int x) { 
-  return x - 10;
+
+
+int main() {
+  int m = multibranch(5, 5);
+  print(m);
 }
 
-sub1(1000000);
-  
+int multibranch(int x, int y) {
+  print(x);
+  print(y);
+  if (x + y == 10) {
+    int x = 2222;
+    return x + y;
+  } else {
+    return 100;
+  }
+}
+

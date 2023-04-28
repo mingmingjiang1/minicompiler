@@ -18,16 +18,16 @@ void Method(const FunctionCallbackInfo<Value>& args) {
       isolate, "world").ToLocalChecked());
 }
 
-void parseInt32(const FunctionCallbackInfo<Value> &args) {
-  // 借用用C++的类型转换
-  auto value  = args[0];
-  std::cout << "hello" << std::endl;
-  args.GetReturnValue().Set(intvalue);
-}
+// void parseInt32(const FunctionCallbackInfo<Value> &args) {
+//   // 借用用C++的类型转换
+//   auto value  = args[0];
+//   std::cout << "hello" << std::endl;
+//   args.GetReturnValue().Set(intvalue);
+// }
 
 void Initialize(Local<Object> exports) {
   NODE_SET_METHOD(exports, "hello", Method);
-  NODE_SET_METHOD(exports, "parseInt32", parseInt32);
+  // NODE_SET_METHOD(exports, "parseInt32", parseInt32);
 }
 
 NODE_MODULE(NODE_GYP_MODULE_NAME, Initialize)
