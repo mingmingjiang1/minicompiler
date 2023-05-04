@@ -1,3 +1,5 @@
+// 单一分支测试用例
+
 int main() {
   int x = test(82);
   print(x);

@@ -16,4 +16,5 @@ export enum TOKEN {
   ERROR,
   WHITE,
   COMMENT,
+  BOOL,
 }
