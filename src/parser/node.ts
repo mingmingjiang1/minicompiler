@@ -76,11 +76,8 @@ export function or(a: VertexNode, b: VertexNode): VertexNode {
   nodeStart.firstEdge.next = new Node(b.index, null, b.edgeVal || null);
   const nodeEnd = new VertexNode(Graph.node_id, null)
   graph.addVertexNode(nodeEnd, nodeEnd.index);
-  console.log(']]]]]]11', a, nodeEnd)
   connect(a, nodeEnd);
-  console.log(']]]]]]22')
   connect(b, nodeEnd);
-  console.log(']]]]]]', nodeEnd)
   return nodeStart;
 }
 
@@ -138,18 +135,15 @@ export function plus(base: VertexNode) {
   // console.log(2222, nodeStart.index)
   graph.addVertexNode(nodeStart, nodeStart.index);
   let cur = base?.firstEdge;
-  console.log(3333, cur)
   while (cur) {
     const vertexNode = graph.getVertex(cur?.index);
     const tmp = new VertexNode(Graph.node_id, vertexNode.edgeVal);
     nodeStart.firstEdge = new Node(tmp.index, null, vertexNode.edgeVal);
     nodeStart = tmp;
-    console.log(444, tmp)
     tmp.firstEdge = base.firstEdge;
     graph.addVertexNode(tmp, tmp.index);
     cur = vertexNode.firstEdge;
   }
-  console.log(nodeStart, 2222, res)
   // graph.addVertexNode(nodeStart, nodeStart.index);
   return mutipliy(res);
 }
@@ -164,14 +158,7 @@ export function mutipliy(wrapped: VertexNode): VertexNode {
 	while (cur.firstEdge) {
     cur = graph.getVertex(cur.firstEdge.index);
 	}
-  console.log(999999, cur)
-  // let tt = graph.getVertex(head.index);
   connect(cur, nodeStart)
-
-  // const pre = tt.firstEdge;
-  // tt.firstEdge = tmp;
-  // tmp.next = pre;
-  console.log('=========', nodeStart)
   return nodeStart;
 }
 

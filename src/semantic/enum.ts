@@ -172,8 +172,10 @@ export const test = {
 
 export const test1 = {
   ["E" + "->" + transformRFH(['Program', '$'])]: 0, // E
-  ['Program' + "->" + transformRFH(['Condition'])]: 1,
-  ['Condition' + "->" + transformRFH(['Program', TOKEN.COND, 'Program'])]: 17,
+  ['Program' + "->" + transformRFH(['Assign', TOKEN.COND, 'Assign'])]: 1,
+  ['Assign' + "->" + transformRFH(['Assign', '+', 'Token'])]: 2,
+  ['Assign' + "->" + transformRFH(['Token'])]: 3,
+  ['Token' + "->" + transformRFH(['x'])]: 4,
 }
 
 export const key2production = invertKeyValues(test)
