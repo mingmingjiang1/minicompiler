@@ -15,4 +15,5 @@ export enum TOKEN {
   CALL,
   ERROR,
   WHITE,
+  COMMENT,
 }

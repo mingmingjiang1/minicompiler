@@ -24,18 +24,21 @@ const fs = require("fs");
 // console.log(hello.parseInt32(32))
 // console.log(hello.hello());
 
+interface Scope {
+  scope: string[];
+  next?: Scope[];
+  parent?: Scope;
+}
+
 export function cgenCaller(
   e: Caller_Class,
   data?: Data[],
   params?: string[], // 形式参数
-  declarations?: string[],
-  isBlock?: boolean,
-  blockDeclarations?: string[],
+  declarations?: Scope
 ) {
-
   let res = "";
   res += "sw $30, 0($29)\naddiu $29, $29, -4\n";
-  res += cgenParams(e.params, data, params, declarations)[0];
+  res += cgenParams(e.params, data, params, declarations);
   res += `jal ${e.id}\n`;
   return res;
 }
@@ -44,13 +47,13 @@ export function cgenParams(
   e: Expression_Class,
   data: Data[],
   params: string[],
-  declarations: string[]
+  declarations?: Scope
 ) {
   // 实参
   let res = "",
     tmp;
   // 逆转参数
-  console.log("params", e, declarations, params);
+  console.log(declarations, 979797, params);
   while (e) {
     res += switchCase(e, data, params, declarations);
     res += "sw $a0, 0($29)\naddiu $29, $29, -4\n"; // 保存参数，但是这个参数可能是局部变量
@@ -63,13 +66,13 @@ export function cgenExpressions(
   e: Expression_Class,
   data: Data[],
   params?: string[],
-  declarations?: string[],
-  isBlock?: boolean,
-  blockDeclarations?: string[]
+  declarations?: Scope
+  // isBlock?: boolean,
+  // blockDeclarations?: string[]
 ) {
   let res: string = "";
   while (e) {
-    res += switchCase(e, data, params, declarations, isBlock, blockDeclarations);
+    res += switchCase(e, data, params, declarations);
     // if (e instanceof Sub_Class) {
     //   res += cgenSub(e, data, params, declarations, isBlock, blockDeclarations);
     // } else if (e instanceof Add_Class) {
@@ -194,58 +197,51 @@ function cgenDiv(
   e: Sub_Class,
   data: Data[],
   params: string[],
-  declarations: string[]
-) {}
+  declarations?: Scope
+) {
+  let res = "";
+  res += switchCase(e.lvalue, data, params, declarations);
+  res += `sw $a0, 0($29)\n`;
+  res += `addiu $29, $29, -4\n`;
+  res += switchCase(e.rvalue, data, params, declarations);
+  res += `lw $t0, 4($29)\n`;
+  res += `addiu $29, $29, 4\n`;
+  res += `div $a0, $t0, $a0\n`;
+  return res;
+}
 
 function cgenMul(
   e: Sub_Class,
   data: Data[],
   params: string[],
-  declarations: string[]
-) {}
+  declarations?: Scope
+) {
+  let res = "";
+  res += switchCase(e.lvalue, data, params, declarations);
+  res += `sw $a0, 0($29)\n`;
+  res += `addiu $29, $29, -4\n`;
+  res += switchCase(e.rvalue, data, params, declarations);
+  res += `lw $t0, 4($29)\n`;
+  res += `addiu $29, $29, 4\n`;
+  res += `mul $a0, $t0, $a0\n`;
+  return res;
+}
 
 function cgenSub(
   e: Sub_Class,
   data: Data[],
   params: string[],
-  declarations: string[],
-  isBlock?: boolean,
-  blockDeclarations?: string[]
+  declarations?: Scope
 ) {
+  console.log(1212121, declarations, e);
   let res = "";
   res += switchCase(e.lvalue, data, params, declarations);
-  // if (e.lvalue instanceof Int_Contant_Class) {
-  //   res += cgenForIntContant(e.lvalue);
-  // } else if (e.lvalue instanceof Sub_Class) {
-  //   res += cgenSub(e.lvalue, data, params, declarations);
-  // } else if (e.lvalue instanceof Add_Class) {
-  //   res += cgenAdd(e.lvalue, data, params, declarations);
-  // } else if (e.lvalue instanceof Div_Class) {
-  //   res += cgenDiv(e.lvalue, data, params, declarations);
-  // } else if (e.lvalue instanceof Mul_Class) {
-  //   res += cgenMul(e.lvalue, data, params, declarations);
-  // } else {
-  //   res += cgenForID(e.lvalue, data, params, declarations);
-  // }
   res += `sw $a0, 0($29)\n`;
   res += `addiu $29, $29, -4\n`;
   res += switchCase(e.rvalue, data, params, declarations);
-  // if (e.rvalue instanceof Int_Contant_Class) {
-  //   res += cgenForIntContant(e.rvalue);
-  // } else if (e.rvalue instanceof Sub_Class) {
-  //   res += cgenSub(e.rvalue, data, params, declarations);
-  // } else if (e.rvalue instanceof Add_Class) {
-  //   res += cgenAdd(e.rvalue, data, params, declarations);
-  // } else if (e.rvalue instanceof Div_Class) {
-  //   res += cgenDiv(e.rvalue, data, params, declarations);
-  // } else if (e.rvalue instanceof Mul_Class) {
-  //   res += cgenMul(e.rvalue, data, params, declarations);
-  // } else {
-  //   res += cgenForID(e.rvalue, data, params, declarations);
-  // }
   res += `lw $t0, 4($29)\n`;
   res += `addiu $29, $29, 4\n`;
-  res += `sub $a0, $a0, $t0\n`;
+  res += `sub $a0, $t0, $a0\n`;
   return res;
 }
 
@@ -253,41 +249,13 @@ function cgenAdd(
   e: Add_Class,
   data: Data[],
   params: string[],
-  declarations: string[],
-  isBlock?: boolean,
-  blockDeclarations?: string[]
+  declarations?: Scope
 ) {
   let res = "";
-  switchCase(e.lvalue, data, params, declarations, isBlock, blockDeclarations);
-  // if (e.lvalue instanceof Int_Contant_Class) {
-  //   res += cgenForIntContant(e.lvalue);
-  // } else if (e.lvalue instanceof Sub_Class) {
-  //   res += cgenSub(e.lvalue, data, params, declarations, isBlock, blockDeclarations);
-  // } else if (e.lvalue instanceof Add_Class) {
-  //   res += cgenAdd(e.lvalue, data, params, declarations, isBlock, blockDeclarations);
-  // } else if (e.lvalue instanceof Div_Class) {
-  //   res += cgenDiv(e.lvalue, data, params, declarations);
-  // } else if (e.lvalue instanceof Mul_Class) {
-  //   res += cgenMul(e.lvalue, data, params, declarations);
-  // } else {
-  //   res += cgenForID(e.lvalue, data, params, declarations, 0, isBlock, blockDeclarations);
-  // }
+  res += switchCase(e.lvalue, data, params, declarations);
   res += `sw $a0, 0($29)\n`;
   res += `addiu $29, $29, -4\n`;
-  res += switchCase(e.rvalue, data, params, declarations, isBlock, blockDeclarations);
-  // if (e.rvalue instanceof Int_Contant_Class) {
-  //   res += cgenForIntContant(e.rvalue);
-  // } else if (e.rvalue instanceof Sub_Class) {
-  //   res += cgenSub(e.rvalue, data, params, declarations, isBlock, blockDeclarations);
-  // } else if (e.rvalue instanceof Add_Class) {
-  //   res += cgenAdd(e.rvalue, data, params, declarations, isBlock, blockDeclarations);
-  // } else if (e.rvalue instanceof Div_Class) {
-  //   res += cgenDiv(e.rvalue, data, params, declarations);
-  // } else if (e.rvalue instanceof Mul_Class) {
-  //   res += cgenMul(e.rvalue, data, params, declarations);
-  // } else {
-  //   res += cgenForID(e.rvalue, data, params, declarations, 0, isBlock, blockDeclarations); // 因为第一个数又进去了一次
-  // }
+  res += switchCase(e.rvalue, data, params, declarations);
   res += `lw $t0, 4($29)\n`;
   res += `addiu $29, $29, 4\n`;
   res += `add $a0, $t0, $a0\n`;
@@ -297,7 +265,7 @@ function cgenAdd(
 function cgenForIntContant(e: Int_Contant_Class, isBlock?: boolean) {
   // code gen for int const corresponding to using int
   let res = "";
-  console.log(77777, e.token)
+  console.log(77777, e.token);
   res += `li $a0, ${e.token}\n`;
   return res;
 }
@@ -306,42 +274,53 @@ function cgenForID(
   e: Indentifier_Class,
   data: Data[],
   params: string[],
-  declarations: string[],
-  offset: number = 0,
-  isBlock?: boolean,
-  blockDeclarations?: string[]
+  declarations?: Scope
 ) {
   // code gen for id using corresponding to using id
   let res = "";
-
-  if (isBlock) {
-    console.log('block', blockDeclarations, declarations);
-    const target = findTargetEle("data", data);
-    // load id to $a0, x
-    if (blockDeclarations.indexOf(e.token) !== -1) {
-      // 说明是局部变量，
-      res += `lw $a0, ${
-        (blockDeclarations.indexOf(e.token) + 1 + declarations.length) * -4 +
-        offset +
-        declarations.length
-      }($30)\n`;
-    } else if (params.indexOf(e.token) !== -1) {
-      // 说明是参数
-      res += `lw $a0, ${(params.indexOf(e.token) + 1) * 4}($30)\n`;
-    } 
-    return res;
-  }
-  console.log('------', params)
+  let cur = declarations;
+  let ans;
+  let offset = 0;
+  // if (isBlock) {
+  //   console.log('block', blockDeclarations, declarations);
+  //   const target = findTargetEle("data", data);
+  //   // load id to $a0, x
+  //   if (blockDeclarations.indexOf(e.token) !== -1) {
+  //     // 说明是局部变量，
+  //     res += `lw $a0, ${
+  //       (blockDeclarations.indexOf(e.token) + 1 + declarations.length) * -4 +
+  //       offset +
+  //       declarations.length
+  //     }($30)\n`;
+  //   } else if (params.indexOf(e.token) !== -1) {
+  //     // 说明是参数
+  //     res += `lw $a0, ${(params.indexOf(e.token) + 1) * 4}($30)\n`;
+  //   }
+  //   return res;
+  // }
+  console.log("------", params, declarations);
   const target = findTargetEle("data", data);
   // load id to $a0, x
+  // 说明是局部变量，
+  while (cur) {
+    const curScope = cur.scope;
+    const isFind = curScope.indexOf(e.token);
+    if (ans) {
+      offset += cur.scope.length;
+    }
+    if (isFind !== -1) {
+      ans = cur;
+    }
+    cur = cur.parent;
+  }
+  if (ans) {
+    res += `lw $a0, ${(ans.scope.indexOf(e.token) + offset + 1) * -4}($30)\n`;
+    return res;
+  }
+  console.log("ans", ans);
   if (params.indexOf(e.token) !== -1) {
     // 说明是参数
     res += `lw $a0, ${(params.indexOf(e.token) + 1) * 4}($30)\n`;
-  } else if (declarations.indexOf(e.token) !== -1) {
-    // 说明是局部变量，
-    res += `lw $a0, ${
-      (declarations.indexOf(e.token) + 1) * -4 + offset
-    }($30)\n`;
   }
   return res;
   // [fn, param1, param2]，使用变量的时候应该从data里取变量，声明的时候，把变量存到data里
@@ -352,91 +331,60 @@ function cgenForIDDeclartion(
   assign: Assign_Class,
   data: Data[],
   params: string[],
-  declarations: string[],
-  isBlock?: boolean,
-  blockDeclarations?: string[]
+  declarations?: Scope
 ) {
   // code gen for Identifier declaration corresponding to id declaration
   let res = "";
   const target = findTargetEle("data", data);
   // declare id in text area
-  console.log(isBlock, blockDeclarations, 8888)
   const r = assign.r; // 获取右侧赋值表达式
-  if (isBlock) {
-    // block scope
-    res += switchCase(r, data, params, declarations, isBlock, blockDeclarations);
 
-    res += `sw $a0, 0($29)\n`;
-    res += `addiu $29, $29, -4\n`;
-    return res;
+  if (r instanceof Sub_Class) {
+    res += cgenSub(r, data, params, declarations); // 结果存到a0
+  } else if (r instanceof Add_Class) {
+    res += cgenAdd(r, data, params, declarations); // 结果存到a0
+  } else if (r instanceof Div_Class) {
+    res += cgenDiv(r, data, params, declarations);
+  } else if (r instanceof Mul_Class) {
+    res += cgenMul(r, data, params, declarations);
+  } else if (r instanceof Int_Contant_Class) {
+    res += cgenForIntContant(r); // 结果存到a0
+  } else if (r instanceof Indentifier_Class) {
+    res += cgenForID(r, data, params, declarations); // 结果存到a0
+  } else if (r instanceof Caller_Class) {
+    res += cgenCaller(r, data, params, declarations);
   }
-
-  res += switchCase(r, data, params, declarations, isBlock, blockDeclarations);
-  // if (r instanceof Sub_Class) {
-  //   res += cgenSub(r, data, params, declarations);
-  // } else if (r instanceof Add_Class) {
-  //   res += cgenAdd(r, data, params, declarations);
-  // } else if (r instanceof Div_Class) {
-  //   res += cgenDiv(r, data, params, declarations);
-  // } else if (r instanceof Mul_Class) {
-  //   res += cgenMul(r, data, params, declarations);
-  // } else if (r instanceof Int_Contant_Class) {
-  //   res += cgenForIntContant(r, isBlock);
-  // } else if (r instanceof Indentifier_Class) {
-  //   res += cgenForID(r, data, params, declarations); // 结果存到a0
-  // } else if (r instanceof Caller_Class) {
-  //   res += cgenCaller(r, data, params, declarations);
-  // }
+  // res += switchCase(r, data, params, declarations);
 
   res += `sw $a0, 0($29)\n`;
   res += `addiu $29, $29, -4\n`;
   return res;
 }
 
-/* 
-[fn, param1, return, y]
-表达式有几种？
-1.int x = Expression(单元（区分变量还是常量），+-)
-2. Return
-3. If-else
-4. Caller
-*/
+// 获取局部变量的总的个数
+function getTotalVar(scopes: Scope) {
+  console.log(scopes, 9999);
+  let cnt = 0;
+  let cur = scopes;
+  while (cur) {
+    cnt += cur.scope.length;
+    cur = cur.parent;
+  }
+  return cnt;
+}
 
 export function cgenReturn(
   e: Return_Class,
   data: Data[],
   params: string[],
-  declarations: string[],
-  isBlock?: boolean,
-  blockDeclarations?: string[]
+  declarations?: Scope // 当前作用域
 ) {
   let res = "";
   const expr = e.expr;
 
-  if (isBlock) {
-    res += cgenExpressions(
-      expr,
-      data,
-      params,
-      declarations,
-      isBlock,
-      blockDeclarations
-    ); // 存储结果在a0
-    // console.log("return:", e, params, declarations, 99991, declarations.length * 4 + 4)
-    res += `move $v0, $a0\n`;
-    res += `addiu $29, $29, ${
-      (declarations.length + blockDeclarations.length) * 4
-    }\n`;
-    res += `lw $31, 4($29)\n`; //
-    res += `addiu $29, $29, ${params.length * 4 + 8}\n`;
-    res += `lw $30, 0($29)\n`; //
-    res += `jr $31\n`;
-    return res;
-  }
-
   res += cgenExpressions(expr, data, params, declarations); // 存储结果在a0
   res += `move $v0, $a0\n`;
-  res += `addiu $29, $29, ${declarations.length * 4}\n`;
+  res += `addiu $29, $29, ${getTotalVar(declarations) * 4}\n`;
   res += `lw $31, 4($29)\n`; //
   res += `addiu $29, $29, ${params.length * 4 + 8}\n`;
   res += `lw $30, 0($29)\n`; //
@@ -450,53 +398,55 @@ export function cgenBranch(
   e: Branch_Class,
   data: Data[],
   params?: string[],
-  declarations?: string[]
+  parent?: Scope
 ) {
   // 生成分支语法
-  const blockDeclarations: string[] = [];
-  let res = `statement${cnt + 1}:\n`;
+  const cnt1 = ++cnt;
+  const cnt2 = ++cnt;
+  let resTrue = `statement${cnt1}:\n`;
   let children;
   let { ifCond, statementTrue, statementFalse } = e;
-  // 先生成statement1和statement2的代码；
+
+  let cur: Scope = {
+    scope: [],
+    next: [],
+    parent,
+  };
+
+  let hasReturnForTrue = false,
+    hasReturnForFalse = false;
+
   while (statementTrue) {
     if (statementTrue instanceof Sub_Class) {
-      res += cgenSub(statementTrue, data, params, declarations);
+      resTrue += cgenSub(statementTrue, data, params, cur);
     } else if (statementTrue instanceof Add_Class) {
-      res += cgenAdd(statementTrue, data, params, declarations);
+      resTrue += cgenAdd(statementTrue, data, params, cur);
     } else if (statementTrue instanceof Div_Class) {
-      res += cgenDiv(statementTrue, data, params, declarations);
+      resTrue += cgenDiv(statementTrue, data, params, cur);
     } else if (statementTrue instanceof Mul_Class) {
-      res += cgenMul(statementTrue, data, params, declarations);
+      resTrue += cgenMul(statementTrue, data, params, cur);
     } else if (statementTrue instanceof Assign_Class) {
-      res += cgenForIDDeclartion(
-        statementTrue,
-        data,
-        params,
-        declarations,
-        true,
-        blockDeclarations
-      );
-      blockDeclarations.push(statementTrue.name);
+      console.log("if 语句", statementTrue, e);
+      resTrue += cgenForIDDeclartion(statementTrue, data, params, cur);
+      cur.scope.push(statementTrue.name);
     } else if (statementTrue instanceof Caller_Class) {
-      res += cgenCaller(statementTrue, data, params, declarations);
+      resTrue += cgenCaller(statementTrue, data, params, cur);
     } else if (statementTrue instanceof Return_Class) {
-      res += cgenReturn(
-        statementTrue,
-        data,
-        params,
-        declarations,
-        true,
-        blockDeclarations
-      );
+      resTrue += cgenReturn(statementTrue, data, params, cur);
+      hasReturnForTrue = true;
+      break; // 遇到return语句一定结束
     } else if (statementTrue instanceof Indentifier_Class) {
-      res += cgenForID(statementTrue, data, params, declarations, 0, true);
+      resTrue += cgenForID(statementTrue, data, params);
     } else if (statementTrue instanceof Branch_Class) {
-      cnt += 2;
-      res += cgenBranch(statementTrue, data, params, declarations);
-      cnt -= 4;
+      resTrue += cgenBranch(statementTrue, data, params, cur);
     }
     statementTrue = statementTrue.next;
   }
+
+  if (!hasReturnForTrue) {
+  }
+
+  parent?.next?.push(cur);
 
   let target = findTargetEle("text", data);
   if (target) {
@@ -504,36 +454,55 @@ export function cgenBranch(
   }
   children.push({
     padding: 0,
-    content: res,
-    key: "function",
+    content: resTrue,
+    key: `statement${cnt1}`,
   });
 
-  res = `statement${cnt + 2}:\n`;
+  let resFalse = `statement${cnt2}:\n`;
+
+  cur = {
+    scope: [],
+    next: [],
+    parent,
+  };
 
   while (statementFalse) {
     if (statementFalse instanceof Sub_Class) {
-      res += cgenSub(statementFalse, data, params, declarations);
+      resFalse += cgenSub(statementFalse, data, params, cur);
     } else if (statementFalse instanceof Add_Class) {
-      res += cgenAdd(statementFalse, data, params, declarations);
+      resFalse += cgenAdd(statementFalse, data, params, cur);
     } else if (statementFalse instanceof Div_Class) {
-      res += cgenDiv(statementFalse, data, params, declarations);
+      resFalse += cgenDiv(statementFalse, data, params, cur);
     } else if (statementFalse instanceof Mul_Class) {
-      res += cgenMul(statementFalse, data, params, declarations);
+      resFalse += cgenMul(statementFalse, data, params, cur);
     } else if (statementFalse instanceof Assign_Class) {
-      res += cgenForIDDeclartion(statementFalse, data, params, declarations);
-      declarations.push(statementFalse.name);
+      console.log("else 语句", statementFalse, e);
+      resFalse += cgenForIDDeclartion(statementFalse, data, params, cur);
+      cur.scope.push(statementFalse.name);
+      // declarations.push(statementFalse.name);
     } else if (statementFalse instanceof Caller_Class) {
-      res += cgenCaller(statementFalse, data, params, declarations);
+      resFalse += cgenCaller(statementFalse, data, params, cur);
     } else if (statementFalse instanceof Return_Class) {
-      res += cgenReturn(statementFalse, data, params, declarations);
+      resFalse += cgenReturn(statementFalse, data, params, cur);
+      hasReturnForFalse = true;
     } else if (statementFalse instanceof Indentifier_Class) {
-      res += cgenForID(statementFalse, data, params, declarations);
-    }  else if (statementFalse instanceof Branch_Class) {
-      cnt += 2;
-      res += cgenBranch(statementFalse, data, params, declarations);
-      cnt -= 4;
+      resFalse += cgenForID(statementFalse, data, params);
+    } else if (statementFalse instanceof Branch_Class) {
+      resFalse += cgenBranch(statementFalse, data, params, cur);
+      const target = findTargetEle("text", data);
+      if (target) {
+        console.log(
+          target.children.find((item) => item.key === `statement2`),
+          22222
+        );
+      }
     }
     statementFalse = statementFalse.next;
+  }
+
+  parent.next.push(cur);
+
+  if (!hasReturnForFalse) {
   }
 
   target = findTargetEle("text", data);
@@ -542,31 +511,71 @@ export function cgenBranch(
   }
   children.push({
     padding: 0,
-    content: res,
-    key: "function",
+    content: resFalse,
+    key: `statement${cnt2}`,
   });
 
   const { op, lExpr, rExpr } = ifCond;
-  res = "";
+  let res = "";
 
-  console.log('========', cnt)
   switch (op) {
     case "==":
-      res += switchCase(lExpr, data, params, declarations);
+      res += switchCase(lExpr, data, params);
       // res += cgenForID(lExpr as any, data, params, declarations);
       res += `sw $a0, 0($29)\n`;
       res += `addiu $29, $29, -4\n`;
-      res += switchCase(rExpr, data, params, declarations);
+      res += switchCase(rExpr, data, params);
       res += `lw $t0, 4($29)\n`;
       res += `addiu $29, $29, 4\n`;
-      res += `beq	$a0, $t0, statement${cnt + 1}\nb statement${cnt + 2}\n`;
+      res += `beq	$t0, $a0, statement${cnt1}\nb statement${cnt2}\n`;
       break;
     case ">=":
-      res += cgenForID(lExpr as any, data, params, declarations);
-      res += `bge	$a0, ${rExpr}, statement${cnt + 1}\nb statement${cnt + 2}\n`;
+      res += switchCase(lExpr, data, params);
+      res += `sw $a0, 0($29)\n`;
+      res += `addiu $29, $29, -4\n`;
+      res += switchCase(rExpr, data, params);
+      res += `lw $t0, 4($29)\n`;
+      res += `addiu $29, $29, 4\n`;
+      res += `bge	$t0, $a0, statement${cnt1}\nb statement${cnt2}\n`;
+      break;
+    case ">":
+      res += switchCase(lExpr, data, params);
+      res += `sw $a0, 0($29)\n`;
+      res += `addiu $29, $29, -4\n`;
+      res += switchCase(rExpr, data, params);
+      res += `lw $t0, 4($29)\n`;
+      res += `addiu $29, $29, 4\n`;
+      res += `bgt	$t0, $a0, statement${cnt1}\nb statement${cnt2}\n`;
+      break;
+    case "<=":
+      res += switchCase(lExpr, data, params);
+      res += `sw $a0, 0($29)\n`;
+      res += `addiu $29, $29, -4\n`;
+      res += switchCase(rExpr, data, params);
+      res += `lw $t0, 4($29)\n`;
+      res += `addiu $29, $29, 4\n`;
+      res += `ble	$t0, $a0, statement${cnt1}\nb statement${cnt2}\n`;
+      break;
+    case "<":
+      res += switchCase(lExpr, data, params);
+      res += `sw $a0, 0($29)\n`;
+      res += `addiu $29, $29, -4\n`;
+      res += switchCase(rExpr, data, params);
+      res += `lw $t0, 4($29)\n`;
+      res += `addiu $29, $29, 4\n`;
+      res += `blt	$t0, $a0, statement${cnt1}\nb statement${cnt2}\n`;
+      break;
+    case "!=":
+      res += switchCase(lExpr, data, params);
+      res += `sw $a0, 0($29)\n`;
+      res += `addiu $29, $29, -4\n`;
+      res += switchCase(rExpr, data, params);
+      res += `lw $t0, 4($29)\n`;
+      res += `addiu $29, $29, 4\n`;
+      res += `bnt	$t0, $a0, statement${cnt1}\nb statement${cnt2}\n`;
       break;
   }
-  cnt += 2;
+
   return res;
 }
 
@@ -588,26 +597,8 @@ function cgenCondition(
   expr: Cond_Class,
   data: Data[],
   params?: string[],
-  declarations?: string[],
-  isBlock?: boolean,
-  blockDeclarations?: string[],
+  declarations?: Scope
 ) {
-  // let resFalse = `statementFalse${cnt + 2}:\n`;
-  // resFalse += `li $a0, 0\n`;
-  // const target = findTargetEle("text", data);
-
-  // let children;
-
-  // if (target) {
-  //   children = target.children;
-  // }
-  // const tmp = {
-  //   padding: 0,
-  //   content: resFalse,
-  //   key: "function",
-  // };
-  // children.push(tmp);
-
   let res = "";
   const { lExpr, rExpr, op } = expr;
 
@@ -642,37 +633,62 @@ function cgenCondition(
       res += `sub $a0, $t0, $a0\n`;
       res += `sgt $a0, $a0, $zero\n`;
       break;
+    case "<=":
+      res += switchCase(lExpr, data, params, declarations);
+      res += `sw $a0, 0($29)\n`;
+      res += `addiu $29, $29, -4\n`;
+      res += switchCase(rExpr, data, params, declarations);
+      res += `lw $t0, 4($29)\n`;
+      res += `addiu $29, $29, 4\n`;
+      res += `sub $a0, $t0, $a0\n`;
+      res += `sle $a0, $a0, $zero\n`;
+      break;
+    case "<":
+      res += switchCase(lExpr, data, params, declarations);
+      res += `sw $a0, 0($29)\n`;
+      res += `addiu $29, $29, -4\n`;
+      res += switchCase(rExpr, data, params, declarations);
+      res += `lw $t0, 4($29)\n`;
+      res += `addiu $29, $29, 4\n`;
+      res += `sub $a0, $t0, $a0\n`;
+      res += `slt $a0, $a0, $zero\n`;
+      break;
   }
 
   return res;
 }
 
+let target: any;
 function switchCase(
   expr: Expression_Class,
   data: Data[] = [],
   params?: string[],
-  declarations?: string[],
-  isBlock?: boolean,
-  blockDeclarations?: string[],
+  declarations?: Scope // 当前作用域
 ) {
   let res = "";
   if (expr instanceof Sub_Class) {
-    res += cgenSub(expr, data, params, declarations, isBlock, blockDeclarations);
+    res += cgenSub(expr, data, params, declarations);
   } else if (expr instanceof Add_Class) {
-    res += cgenAdd(expr, data, params, declarations, isBlock, blockDeclarations);
+    res += cgenAdd(expr, data, params, declarations);
   } else if (expr instanceof Div_Class) {
     res += cgenDiv(expr, data, params, declarations);
   } else if (expr instanceof Mul_Class) {
     res += cgenMul(expr, data, params, declarations);
   } else if (expr instanceof Assign_Class) {
-    res += cgenForIDDeclartion(expr, data, params, declarations, isBlock, blockDeclarations);
-    declarations.push(expr.name);
+    res += cgenForIDDeclartion(expr, data, params, declarations);
+    declarations.scope.push(expr.name);
   } else if (expr instanceof Caller_Class) {
     res += cgenCaller(expr, data, params, declarations);
+    console.log(77777, declarations.scope);
   } else if (expr instanceof Return_Class) {
-    res += cgenReturn(expr, data, params, declarations, isBlock, blockDeclarations);
+    res += cgenReturn(expr, data, params, declarations);
+    if (target) {
+      // 说明之前出现分支语句了
+      // target.content += res;
+      console.log(target.content, "++++++++", res);
+    }
   } else if (expr instanceof Indentifier_Class) {
-    res += cgenForID(expr, data, params, declarations, 0, isBlock, blockDeclarations);
+    res += cgenForID(expr, data, params, declarations);
   } else if (expr instanceof Int_Contant_Class) {
     res += cgenForIntContant(expr);
   } else if (expr instanceof Cond_Class) {
@@ -681,7 +697,7 @@ function switchCase(
     cgenFunction(expr, data);
   } else if (expr instanceof Branch_Class) {
     res += cgenBranch(expr, data, params, declarations);
-  } 
+  }
 
   return res;
 }
@@ -724,7 +740,11 @@ function switchCase(
 
 export function cgenFunction(f: Function_Class, data: Data[]) {
   // function definition
-  const declarations: string[] = [];
+  // const declarations: string[] = [];
+  const rootScope: Scope = {
+    scope: [], // 最顶层是函数作用域
+    next: [],
+  };
   let res = `${f.name}:\n`;
   const { expressions, formals, formal_list } = f; // params是形式参
   const target = findTargetEle("text", data);
@@ -732,12 +752,18 @@ export function cgenFunction(f: Function_Class, data: Data[]) {
   if (target) {
     children = target.children;
     res += "move $30, $29\nsw $31, 0($29)\naddiu $29, $29, -4\n"; // return addr 放在栈顶
-    res += cgenExpressions(expressions, data, formal_list.reverse(), declarations); // 不可能是函数
+    res += cgenExpressions(
+      expressions,
+      data,
+      formal_list.map((formal) => formal.id).reverse(),
+      rootScope
+    ); // 不可能是函数
   }
   // res += `lw $31, 4($29)\naddiu $29, $29, -${f.test.length * 4}\nlw $30, 0($29)\njr $31\n`; // 这里应该放置清空局部变量(n个)和参数以及return addr
-  if (!f.return_type) {
+  console.log(11111, rootScope);
+  if (f.return_type === "void") {
     res += `move $v0, $a0\n`;
-    res += `addiu $29, $29, ${declarations.length * 4}\n`;
+    res += `addiu $29, $29, ${rootScope.scope.length * 4}\n`;
     res += `lw $31, 4($29)\n`; //
     res += `addiu $29, $29, ${formal_list.length * 4 + 8}\n`;
     res += `lw $30, 0($29)\n`; //

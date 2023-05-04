@@ -23,6 +23,7 @@ import { success } from "../utils";
 import { key2production, test as production2key } from "./enum";
 import { cloneDeep, isEqual } from "lodash";
 import { switchCase } from "./setUtil";
+import { checkMain } from "./check";
 
 const fs = require("fs");
 
@@ -322,9 +323,8 @@ class Parser {
     // console.log(_nts, 1111)
     // 3 若存在一个表达式 X -> ABCD 则 Follow(A) 需要加上 First(B) - ε，若First(B) 包含 ε，则Follow(A) 需要加上 First(C) - ε，向右迭代... 迭代至表达式结束。
     for (const nts of this.nonTerminalSymbol) {
-      console.log(this.lfh2rfh.get(nts), 9999);
       for (let grammarArr of this.lfh2rfh.get(nts)) {
-        console.log(grammarArr, nts, _nts);
+      
         const len = grammarArr.value.length;
         let index = -1;
         // 找到 B
@@ -489,20 +489,6 @@ class Parser {
   }
 
   startBuildFollowSet() {
-    // let ans: string[];
-    // const memo = new Map<string, string[]>([]);
-    // for (const [lfh, rfhs] of this.lfh2rfh) {
-    //   // 遍历所有产生shi
-    //   if (memo.get(lfh)) {
-    //     continue;
-    //   } else {
-    //     this.followSet(lfh, memo);
-    //   }
-    // }
-    // console.log(memo);
-    // // console.log(res)
-    // this.memo = memo;
-
     for (let nts of this.nonTerminalSymbol) {
       this._followSet[nts] = new Set();
     }
@@ -548,174 +534,6 @@ class Parser {
         let tmp = production!.rfh.length;
         // let res;
         const res = switchCase(production, key2production, yyvalsp);
-        // switch (production.lfh + "->" + production.rfh.join(" ")) {
-        //   case key2production[0]:
-        //     // todo
-        //     break;
-        //   case key2production[1]:
-        //     res = yyvalsp[0];
-        //     break;
-        //   case key2production[2]:
-        //     console.log(yyvalsp);
-        //     let tmp = yyvalsp[1];
-        //     while (tmp.next) {
-        //       tmp = tmp.next;
-        //     }
-        //     tmp.next = yyvalsp[0];
-        //     res = yyvalsp[1];
-        //     break;
-        //   case key2production[3]:
-        //     res = new Function_Class(
-        //       yyvalsp[5][2],
-        //       yyvalsp[4][2],
-        //       yyvalsp[2],
-        //       yyvalsp[0]
-        //     );
-        //     break;
-        //   case key2production[4]:
-        //     res = new Function_Class(
-        //       yyvalsp[4][2],
-        //       yyvalsp[3][2],
-        //       undefined,
-        //       yyvalsp[0]
-        //     );
-        //     break;
-        //   case key2production[5]: //
-        //     res = yyvalsp[1];
-        //     break;
-        //   case key2production[6]: //
-        //     res = yyvalsp[0];
-        //     break;
-        //   case key2production[7]: //
-        //     let tmp2 = yyvalsp[1];
-        //     while (tmp2.next) {
-        //       tmp2 = tmp2.next;
-        //     }
-        //     tmp2.next = yyvalsp[0];
-        //     res = yyvalsp[1];
-        //     // yyvalsp[1].next = yyvalsp[0];
-        //     // res = yyvalsp[1];
-        //     break;
-        //   case key2production[8]: // if-else-
-        //     // todo;
-        //     res = new Branch_Class(yyvalsp[4], yyvalsp[2], yyvalsp[0]);
-        //     break;
-        //   case key2production[9]:
-        //     res = new Cond_Class(yyvalsp[2][2], yyvalsp[1][2], yyvalsp[0][2]);
-        //     break;
-        //   case key2production[10]:
-        //     res = new Cond_Class(yyvalsp[2][2], yyvalsp[1][2], yyvalsp[0][2]);
-        //     break;
-        //   case key2production[11]:
-        //     res = new Cond_Class(yyvalsp[2][2], yyvalsp[1][2], yyvalsp[0][2]);
-        //     break;
-        //   case key2production[12]: // Caller return
-        //     res = new Cond_Class(yyvalsp[2][2], yyvalsp[1][2], yyvalsp[0][2]);
-        //     break;
-        //   case key2production[13]: // 参数-单数
-        //     res = new Formal_Class(yyvalsp[0][2], yyvalsp[1][2]);
-        //     break;
-        //   case key2production[14]: // 参数-复数
-        //     res = new Formal_Class(yyvalsp[0][2], yyvalsp[1][2], yyvalsp[3]);
-        //     break;
-        //   case key2production[15]: // 声明式加减乘除 语句
-        //     res = new Assign_Class(yyvalsp[3][2], yyvalsp[4][2], yyvalsp[1]);
-        //     break;
-        //   case key2production[16]: // Cassign Caller
-        //     res = new Assign_Class(yyvalsp[3][2], yyvalsp[4][2], yyvalsp[0]);
-        //     break;
-        //   case key2production[17]: // +
-        //     // todo
-        //     res = new Add_Class(yyvalsp[2], yyvalsp[0]);
-        //     break;
-        //   case key2production[18]: // /
-        //     // todo
-        //     res = new Cond_Class(yyvalsp[2], yyvalsp[1], yyvalsp[0]);
-        //     break;
-        //   case key2production[19]: // *
-        //     // todo
-        //     res = new Mul_Class(yyvalsp[2], yyvalsp[0]);
-        //     break;
-
-        //   case key2production[20]: // -
-        //     res = new Sub_Class(yyvalsp[2], yyvalsp[0]);
-        //     break;
-        //   case key2production[21]: // Caller return
-        //     res = yyvalsp[0];
-        //     break;
-        //   case key2production[22]: // ID
-        //     res = new Indentifier_Class(yyvalsp[0][2]);
-        //     break;
-        //   case key2production[23]: // Conatant
-        //     res = new Int_Contant_Class(yyvalsp[0][2]);
-        //     break;
-
-        //   case key2production[24]: // 单数参数
-        //     res = new Params_Class(yyvalsp[0]);
-        //     break;
-        //   case key2production[25]: // 复数参数
-        //     yyvalsp[1] = new Params_Class(yyvalsp[0], yyvalsp[2]);
-        //     res = yyvalsp[1];
-        //     break;
-        //   case key2production[26]: // Caller return
-        //     res = new Caller_Class(yyvalsp[3][2]);
-        //     break;
-        //   case key2production[27]: // Caller return
-        //     res = new Caller_Class(yyvalsp[4][2], yyvalsp[2]);
-        //     break;
-        //   case key2production[29]: // Caller return
-        //     // let tmp3 = new Return_Class(yyvalsp[1]);
-        //     // while (tmp3.next) {
-        //     //   tmp3 = tmp3.next;
-        //     // }
-        //     // tmp3.next = yyvalsp[0];
-        //     // res = yyvalsp[1];
-        //     res = new Return_Class(yyvalsp[1]);
-        //     break;
-        //   case key2production[30]: // Caller return
-        //     res = new Return_Class(yyvalsp[0]);
-        //     break;
-        //   case key2production[31]: // nothing return
-        //   // to do
-        //   case key2production[32]:
-        //     res = yyvalsp[0];
-        //     break;
-        //   case key2production[33]:
-        //     console.log(1111);
-        //     res = yyvalsp[0];
-        //     break;
-        //   case key2production[34]:
-        //     res = new Caller_Class(yyvalsp[4][2], yyvalsp[2]);
-        //     break;
-        //   case key2production[35]:
-        //     res = new Return_Class(new Indentifier_Class(yyvalsp[1][2]));
-        //     break;
-        //   case key2production[36]:
-        //     res = new Return_Class(yyvalsp[1]);
-        //     break;
-        //   case key2production[37]:
-        //     // res = new Assign_Class(yyvalsp[3][2], yyvalsp[4][2], yyvalsp[1]);
-        //     // break;
-        //     console.log(2222);
-        //     res = yyvalsp[0];
-        //     break;
-        //   case key2production[38]:
-        //     res = new Return_Class(
-        //       new Sub_Class(
-        //         new Int_Contant_Class(yyvalsp[3][2]),
-        //         new Indentifier_Class(yyvalsp[1][2])
-        //       )
-        //     );
-        //     break;
-        //   case key2production[39]:
-        //     res = new Return_Class(
-        //       new Sub_Class(
-        //         new Indentifier_Class(yyvalsp[3][2]),
-        //         new Indentifier_Class(yyvalsp[1][2])
-        //       )
-        //     );
-        //     break;
-        // }
         // 规约，弹出
         matches = [];
         while (tmp) {
@@ -826,7 +644,6 @@ class Parser {
           T.add(newState);
         } else {
           // success("重复啦");
-          // console.log(J);
           for (const mm of T) {
             if (mm.key === key && mm.ptrKey === ptrKey) {
               const newState = {
@@ -846,8 +663,6 @@ class Parser {
       }
     }
 
-    success('成功');
-
     // 初始化列表
     this.tokenEnum.map((token) => {
       this.table[token] = new Array(500);
@@ -863,7 +678,6 @@ class Parser {
         // 在状态I，遇到超前查看符号_item,将用item进行规约
         Object.keys(this.table).forEach((key) => {
           for (const char of Array.from(this._followSet[item.lfh])) {
-            // console.log(7676776, item.pointer, item.rfh.length)
             if (char === key && item.pointer >= item.rfh.length) {
               this.table[key][value.State.Iindex] = "r" + item.ind;
             }
@@ -882,14 +696,13 @@ class Parser {
         : "s" + (value.to as State).Iindex;
       // console.log('start: ', value.from.Iindex, '对应的状态是:', value.from.items, '=>', 'end: ', value.to.Iindex, '对应的状态是:', value.to.items, 'edge is: ', value.value)
     });
-    // console.table(this.table);
   }
 }
 
 function main() {
-  const data = fs.readFileSync("./examples/example.mc");
+  const targetFile = process.argv[2];
+  const data = fs.readFileSync(`${targetFile}`);
   const tokens = scan(data.toString());
-  const input = tokens.map((item) => item[1]);
   const parser = new Parser();
 
   // 符号理论上应该是根据semantic生成的
@@ -917,7 +730,6 @@ function main() {
     TOKEN.ELSE,
     TOKEN.IF,
     TOKEN.COND,
-    TOKEN.CALL,
   ]);
 
   Object.entries(production2key).forEach(([production, index]) => {
@@ -926,12 +738,12 @@ function main() {
   });
 
   parser.get_dfa(false, false);
-  // parser.startBuildFollowSet();
   const ast = parser.trace(tokens);
   console.dir(ast, { depth: null });
   if (ast) {
     ast.transverse();
     cgenProgram(ast);
+    checkMain();
   }
 }
 

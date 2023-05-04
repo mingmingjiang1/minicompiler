@@ -20,13 +20,10 @@ sw $31, 0($29)
 addiu $29, $29, -4
 sw $30, 0($29)
 addiu $29, $29, -4
-li $a0, 5
+li $a0, 82
 sw $a0, 0($29)
 addiu $29, $29, -4
-li $a0, 5
-sw $a0, 0($29)
-addiu $29, $29, -4
-jal multibranch
+,jal test
 sw $a0, 0($29)
 addiu $29, $29, -4
 sw $30, 0($29)
@@ -34,59 +31,55 @@ addiu $29, $29, -4
 lw $a0, -4($30)
 sw $a0, 0($29)
 addiu $29, $29, -4
-jal print
+,jal print
 li $v0, 10
 syscall
 statement1:
-li $a0, 2222
+li $a0, 20
 sw $a0, 0($29)
 addiu $29, $29, -4
+li $a0, 200
 sw $a0, 0($29)
 addiu $29, $29, -4
-lw $a0, 4($30)
+li $a0, 50
 lw $t0, 4($29)
 addiu $29, $29, 4
 add $a0, $t0, $a0
-move $v0, $a0
+sw $a0, 0($29)
+addiu $29, $29, -4
+li $a0, 20
+lw $t0, 4($29)
 addiu $29, $29, 4
+mul $a0, $t0, $a0
+move $v0, $a0
+addiu $29, $29, 8
 lw $31, 4($29)
-addiu $29, $29, 16
+addiu $29, $29, 12
 lw $30, 0($29)
 jr $31
 statement2:
-li $a0, 100
+li $a0, 200
+sw $a0, 0($29)
+addiu $29, $29, -4
+li $a0, 300
 move $v0, $a0
-addiu $29, $29, 0
+addiu $29, $29, 8
 lw $31, 4($29)
-addiu $29, $29, 16
+addiu $29, $29, 12
 lw $30, 0($29)
 jr $31
-multibranch:
+test:
 move $30, $29
 sw $31, 0($29)
 addiu $29, $29, -4
-sw $30, 0($29)
-addiu $29, $29, -4
-lw $a0, 8($30)
-sw $a0, 0($29)
-addiu $29, $29, -4
-jal print
-sw $30, 0($29)
-addiu $29, $29, -4
-lw $a0, 4($30)
-sw $a0, 0($29)
-addiu $29, $29, -4
-jal print
+li $a0, 100
 sw $a0, 0($29)
 addiu $29, $29, -4
 lw $a0, 4($30)
-lw $t0, 4($29)
-addiu $29, $29, 4
-add $a0, $t0, $a0
 sw $a0, 0($29)
 addiu $29, $29, -4
-li $a0, 10
+li $a0, 50
 lw $t0, 4($29)
 addiu $29, $29, 4
-beq	$a0, $t0, statement1
+bgt	$t0, $a0, statement1
 b statement2

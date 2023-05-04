@@ -1,4 +1,5 @@
 import { success } from "../utils";
+import { FunctionMap } from "./check";
 const fs = require("fs");
 
 /* 
@@ -72,9 +73,9 @@ export class Return_Class extends Expression_Class {
 
 export class Caller_Class extends Expression_Class {
   public id: string;
-  public params: Params_Class;
+  public params: Expression_Class;
   public params_list: string[] = [];
-  constructor(id: string, params?: Params_Class, next?: Expression_Class) {
+  constructor(id: string, params?: Expression_Class, next?: Expression_Class) {
     super();
     this.id = id;
     this.params = params;
@@ -110,7 +111,8 @@ export class Function_Class extends Expression_Class {
   public expressions: Expression_Class; // 表达式
   public formals: Formal_Class; // 形参
   public return_type: string; //函数名
-  public formal_list: string[] = [];
+  public formal_list: {type: string, id
+    : string}[] = [];
   constructor(returnType: string, name: string, formals?: Formal_Class, expressions?: Expression_Class, next?: Expression_Class) {
     super();
     this.name = name;
@@ -119,7 +121,7 @@ export class Function_Class extends Expression_Class {
     this.next = next;
     this.return_type = returnType;
     while (formals) {
-      this.formal_list.unshift(formals.name);
+      this.formal_list.unshift({type: formals.type, id: formals.name});
       formals = formals.next as any
     }
     console.log(444, this.formal_list)
@@ -130,6 +132,11 @@ export class Function_Class extends Expression_Class {
     success('开始遍历函数: ');
     console.log("函数名: ", this.name);
     console.log("函数预期返回类型:", this.return_type);
+    const isExisted = FunctionMap.get(this.name);
+    if (isExisted) {
+      throw new Error("Duplicate function implementation");
+    }
+    FunctionMap.set(this.name, this);
     this.formals?.transverse();
     this.expressions?.transverse();
     if (this.next) {

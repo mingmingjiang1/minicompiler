@@ -20,8 +20,7 @@ declare enum TOKEN {
 %%
 if  {return TOKEN.IF;}
 else  {return TOKEN.ELSE;}
-int  {return TOKEN.TYPE;}
-call  {return TOKEN.CALL;}
+int|bool|void  {return TOKEN.TYPE;}
 return  {return TOKEN.KEYWORD;}
 [a-z][a-z0-9]*  {return TOKEN.ID;}
 [0-9]+  {return TOKEN.NUM;}
@@ -43,12 +42,10 @@ return  {return TOKEN.KEYWORD;}
 >  {return TOKEN.COND;}
 <  {return TOKEN.COND;}
 =  {return TOKEN.ASSIGN;}
-?  {return '?';}
 -  {return '-';}
 \+  {return '+';}
+\*  {return '*';}
+/  {return '/';}
+//  {return TOKEN.COMMENT;}
 [:-`]   {return TOKEN.ERROR;}
 %%
-
-Caller -> ID(O)
-O -> ID | O, ID
-

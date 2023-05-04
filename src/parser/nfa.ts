@@ -1,4 +1,3 @@
-import chalk from "chalk";
 import { atoi, getWhiteChar, transformCharacter } from "../utils";
 import graph, {
   characters,
@@ -14,70 +13,6 @@ import graph, {
 const fs = require("fs");
 
 const leafs: { index: number; action: Function }[] = [];
-
-const resultGlobal: { pattern: string; action: string }[][] = [
-  [
-    {
-      pattern: "[abcd]|[a-z][a-z0-9]+|[0-9]*test", // 括号只有可能作为捕获存在，所以|左右两侧的操作符，左侧的[a-z][a-z0-9]*先计算完一个节点M，即M|rjrjjr,然后计算M|r的Node N，push到stack内[N, jrjjr]
-      action: "return 'ID'",
-    },
-  ],
-  [
-    {
-      pattern: "[a-z][a-z0-9]*|rjrjjr", // 括号只有可能作为捕获存在，所以|左右两侧的操作符，左侧的[a-z][a-z0-9]*先计算完一个节点M，即M|rjrjjr,然后计算M|r的Node N，push到stack内[N, jrjjr]
-      action: "return 'ID'",
-    },
-  ],
-  [
-    {
-      pattern: "a|bc|d",
-      action: "return 'ERROR'",
-    },
-  ],
-  [
-    {
-      pattern: "if",
-      action: "console.log(111);return 222",
-    },
-    {
-      pattern: "[a-z][a-z0-9]*",
-      action: "return 'ID'",
-    },
-    {
-      pattern: "[0-9]+",
-      action: "return 'NUM'",
-    },
-    {
-      pattern: "[:-`]",
-      action: "return 'ERROR'",
-    },
-    // {
-    //   pattern: "\\(", // 转义括号
-    //   action: "console.log(111);return 222",
-    // },
-    // {
-    //   pattern: "\\)",
-    //   action: "console.log(111);return 222",
-    // },
-    // {
-    //   pattern: "([a-z][a-z0-9]*) | (rjrjjr)",
-    //   action: "return 'ID'",
-    // },
-    {
-      pattern: "a|[a-z]+",
-      action: "return 'ERROR'",
-    },
-    // {
-    //   pattern: "\\s",
-    //   action: "return 'WHITE'",
-  ],
-  [
-    {
-      pattern: "a|bdef|c|xxxx|y", // 贪婪读取。一直读到下一个｜或者是(),需要贪婪匹配的一些符号，eg: |, (, [,对于a|b|c, 先用
-      action: "return 'ERROR'",
-    },
-  ],
-];
 
 export function readToken(filename: string) {
   // 读取文件，获取正则规则和action
@@ -105,61 +40,6 @@ function flex(
   tokens: { pattern: string; action: string }[]
 ): [any[][], { index: number; action: Function }[]] {
   // 读取以p结尾的文件，过滤注释，解析由%%包裹的部分，即语法
-  console.log(tokens, 999);
-  const result: { pattern: string; action: string }[] = [
-    {
-      pattern: "if",
-      action: "console.log(111);return 222",
-    },
-    {
-      pattern: "[a-z][a-z0-9]*",
-      action: "return 'ID'",
-    },
-    {
-      pattern: "[0-9]+",
-      action: "return 'NUM'",
-    },
-    {
-      pattern: "[:-`]",
-      action: "return 'ERROR'",
-    },
-    // {
-    //   pattern: "[a-z][a-z0-9]*|rjrjjr", // 括号只有可能作为捕获存在，所以|左右两侧的操作符，左侧的[a-z][a-z0-9]*先计算完一个节点M，即M|rjrjjr,然后计算M|r的Node N，push到stack内[N, jrjjr]
-    //   action: "return 'ID'",
-    // },
-    // {
-    //   pattern: "(", // 转义括号
-    //   action: "console.log(111);return 222",
-    // },
-    // {
-    //   pattern: "\\)",
-    //   action: "console.log(111);return 222",
-    // },
-    // {
-    //   pattern: "([a-z][a-z0-9]*) | (rjrjjr)",
-    //   action: "return 'ID'",
-    // },
-    // {
-    //   pattern: "a|[a-z]+",
-    //   action: "return 'ERROR'",
-    // },
-    // {
-    //   pattern: "\\s",
-    //   action: "return 'WHITE'",
-    // },
-    // {
-    //   pattern: "a|bdef|c|xxxx|y", // 贪婪读取。一直读到下一个｜或者是(),需要贪婪匹配的一些符号，eg: |, (, [,对于a|b|c, 先用
-    //   action: "return 'ERROR'",
-    // },
-    // {
-    //   pattern: "a|bc|d", //
-    //   action: "return 'ERROR'",
-    // },
-    // {
-    //   pattern: "a|[0-9]*&", // 括号只有可能作为捕获存在，所以|左右两侧的操作符，左侧的[a-z][a-z0-9]*先计算完一个节点M，即M|rjrjjr,然后计算M|r的Node N，push到stack内[N, jrjjr]
-    //   action: "return 'ID'",
-    // },
-  ];
 
   const greedyRead = (char: string, s: string) => {
     return s.indexOf(char); // 返回下一个预期符号的位置的前一位
@@ -176,7 +56,6 @@ function flex(
       throw new Error("error: 规则模式不能为空");
     }
 
-    let parentThesis: (string | VertexNode)[] = []; // 圆括号对应的包裹的字符
     let squareBracket: (string | VertexNode)[] = []; // 方括号对应的包裹的字符
     let squareBracketMode: boolean = false; // 方括号模式
     let outer = 0;
@@ -224,19 +103,17 @@ function flex(
               stackForSquare.push(squareBracket[i] as string);
             }
             chars.push(...stackForSquare);
-            const node2 = characters(chars);
+            const node = characters(chars);
             // graph.add_single_vertex(Graph.node_id - 1, null);
 
-            stack.push(node2);
+            stack.push(node);
             squareBracket = [];
             break;
           case "|":
             // support or Regx
             // pop two tmies
             orMode = true;
-            console.log("++++++", pattern);
             const pos = greedyRead("|", pattern.slice(i + 1)); // find next position
-            console.log("889", i + 1, pos, pattern.slice(i + 1, pos + i + 1));
             const res = test(
               pos === -1
                 ? pattern.slice(i + 1)
@@ -247,11 +124,14 @@ function flex(
               i = pattern.length - 1;
             } else {
               i = pos + i;
-              console.log("--------", i);
             }
-            const head4 = stack.pop();
-            const test2 = or(res as VertexNode, head4 as VertexNode);
-            console.log(88888888888);
+            let start = stack.pop();
+            while (stack.length) {
+              const cur = stack.pop();
+              start = connect(cur as VertexNode, start as VertexNode);
+              // start = connect((tmp as Node).index, (start as Node).index);
+            }
+            const test2 = or(res as VertexNode, start as VertexNode);
             stack.push(test2);
             break;
           case "*":
@@ -273,6 +153,7 @@ function flex(
           //   break;
           case "\\":
             // support translate character
+            console.log(8888824, pattern[i + 1]);
             if (!squareBracketMode) {
               let node;
               if (pattern[i + 1] === "s") {
@@ -292,29 +173,22 @@ function flex(
                 stack.push(node);
               }
 
-              // if (pattern[i + 1] === "+") {
-              //   // white character
-              // } else if (pattern[i + 1] === "*") {
-              //   // \t
-              // }
-              console.log(88888888)
               i += 1;
             }
           default:
             // plain character
             if (squareBracketMode) {
-              console.log(999991, pattern[i]);
               if (transformCharacter(pattern[i])) {
-                console.log("494949");
                 i += 1;
                 stack.push(getWhiteChar(pattern[i]));
               } else {
                 stack.push(pattern[i]);
               }
             } else {
-              const node3 = new VertexNode(Graph.node_id, pattern[i]);
-              graph.addVertexNode(node3, node3.index);
-              stack.push(node3);
+              console.log(pattern[i])
+              const node = new VertexNode(Graph.node_id, pattern[i]);
+              graph.addVertexNode(node, node.index);
+              stack.push(node);
             }
             break;
         }
@@ -327,8 +201,6 @@ function flex(
         );
       }
 
-      // 构建边
-      // 组合成一个新的大的NFA
       let start = stack.pop();
       if (deepth === 0) {
         console.log(getEndofPath(start as VertexNode).index);
@@ -337,7 +209,6 @@ function flex(
           action: new Function("yytext", "TOKEN", action),
         }); // 寻找叶子节点
       }
-      console.log(chalk.green("leaf node: "), start, stack.length); // 在这里确定叶子节点,放置action动作，the element of top stack
 
       while (stack.length) {
         const cur = stack.pop();
@@ -360,18 +231,15 @@ function flex(
         (start as VertexNode).edgeVal
       );
     }
-    console.log(chalk.green("start: "), start);
   }
 
   const ans: any[] = [];
   const paths: (string | string[])[][] = [];
   const vis: [number, number][] = [];
-  console.log(leafs, 8485885);
-  const edges = new Array(200).fill(0).map((item) => {
+  const edges = new Array(200).fill(0).map((_item) => {
     return new Array(200).fill(0);
   });
   build_edges(node, [], ans, vis, [], paths, edges);
-  console.log(edges[1][40], 222222);
   return [edges, leafs];
 }
 
@@ -413,8 +281,7 @@ function build_edges(
       ? null
       : atoi(node.edgeVal);
     vis.push([root.index, cur.index]);
-    // console.log(edges[root.index][cur.index], 9999, root.index, cur.index)
-    // console.log(2222, cur.edge, root.edgeVal)
+
     build_edges(node, res, ans, vis, path, paths, edges);
     vis.pop();
     res.pop();
@@ -422,10 +289,3 @@ function build_edges(
     cur = cur.next;
   }
 }
-
-/* 
-贪婪读取
-明天做一些测试用例，然后把parser部分完结
-commit一次
-以及把semantic
-*/

@@ -14,7 +14,6 @@ function getEndofEdges(state: number, c: number | null) {
   const res: number[] = [];
   let i = 0;
   for (const edge of edges[state]) {
-    // console.log(111, edge);
     if (edge === null || edge || (edge !== null && edge.length)) {
       // 说明存在边
       if (edge === c || (edge !== null && edge.length >= 0 && edge?.includes(c))) {
@@ -28,8 +27,6 @@ function getEndofEdges(state: number, c: number | null) {
   }
   return res;
 }
-
-success('get union NFA start nodes: ', getClosure([0], null));
 
 export function getClosure(S: number[], c: number | null) {
   const queue = [...S];
@@ -66,17 +63,6 @@ console.log(DFAedge([10, 11, 13, 15], atoi('0'))); // [ 12, 13, 11 ]
 console.log(DFAedge([1, 4, 14, 9], atoi('`'))); // [15]
 // console.log(atoi(' '), DFAedge([1, 4, 9, 14], atoi(' '))); // [15]
 // console.log(DFAedge([1, 4, 9, 14], atoi('{'))); // [16]
-
-// NFA模拟算法
-// function getNFA(initState: number[], k: number, chars: number[]) {
-//   let j = initState;
-//   for (let i = 0;i < k;i++) {
-//     // j是某一个节点状态的集合
-//     j = DFAedge(j, chars[i]);
-//   }
-// }
-
-// getNFA()
 
 // // 获取nfa对应的dfa
 function NFA2DFA(alpabets: number[], initState: number[]) {
@@ -168,8 +154,18 @@ export function scan(input: string) {
     ind?: number[];
     key?: number;
   };
+  let preToken;
   let i  = 0;
   while (i < input.length) {
+    if (preToken === TOKEN.COMMENT) {
+      i += 1;
+      if (input[i] === '\n') {
+        tokens.pop();
+        preToken = undefined;
+      }
+      continue;
+    }
+    console.log('99999', input[i], preToken);
     let code: number;
     code = atoi(input[i]);
     // 特殊判断
@@ -182,13 +178,14 @@ export function scan(input: string) {
       // error('该节点不存在对应输入的出边，上一个状态key%s，第%s个字符，%s： ', preState.key, i, input[i], code);
       // console.log(chalk.blue('可能该节点是叶子节点，也有可能是该节点确实是个死胡同'));
       if (target) {
-        if (target.action(yytext, TOKEN) === undefined) {
+        preToken = target.action(yytext, TOKEN);
+        if (preToken === undefined) {
           throw new Error(`the type from action ${target.action} is error: ${yytext}`);
         }
         if (yytext === '?') {
-          console.log(target.action(yytext, TOKEN), yytext)
+          console.log(preToken, yytext)
         }
-        tokens.push([number_line, target.action(yytext, TOKEN), yytext])
+        tokens.push([number_line, preToken, yytext]);
         // tokens.push(TOKENMAP[leafs[target] as TOKEN] === undefined ? [number_line, '', input[i-1]] : [number_line, TOKENMAP[leafs[target] as TOKEN], yytext]);
       } 
       startState = {

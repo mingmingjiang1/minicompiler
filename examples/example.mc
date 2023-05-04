@@ -1,7 +1,7 @@
-
+// 测试数据
 
 int main() {
-  int m = multibranch(5, 5);
+  int m = multibranch(6, 5);
   print(m);
 }
 
