@@ -225,4 +225,4 @@ function checkFunc(f: Function_Class) {
     throw new Error(`Type 'void' is not assignable to type '${return_type}'.`);
   }
 }
-// Duplicate function implementation.
+// Duplicate function implementation1212.
