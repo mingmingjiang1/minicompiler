@@ -18,12 +18,13 @@ declare enum TOKEN {
 %%
 
 %%
-if  {return TOKEN.IF;}
-else  {return TOKEN.ELSE;}
-int|bool|void  {return TOKEN.TYPE;}
+True|False  {return TOKEN.BOOL;}
 return  {return TOKEN.KEYWORD;}
-[a-z][a-z0-9]*  {return TOKEN.ID;}
+int|bool|void  {return TOKEN.TYPE;}
+else  {return TOKEN.ELSE;}
+if  {return TOKEN.IF;}
 [0-9]+  {return TOKEN.NUM;}
+[a-z][a-z0-9]*  {return TOKEN.ID;}
 [\s\t\n]  {return TOKEN.WHITE;}
 {  {return '{';}
 }  {return '}';}
@@ -33,19 +34,15 @@ return  {return TOKEN.KEYWORD;}
 ,  {return ',';}
 ==  {return TOKEN.COND;}
 >=  {return TOKEN.COND;}
-<=  {return TOKEN.COND;}
 >  {return TOKEN.COND;}
 <  {return TOKEN.COND;}
+<=  {return TOKEN.COND;}
 !=  {return TOKEN.COND;}
->=  {return TOKEN.COND;}
-<=  {return TOKEN.COND;}
->  {return TOKEN.COND;}
-<  {return TOKEN.COND;}
 =  {return TOKEN.ASSIGN;}
 -  {return '-';}
 \+  {return '+';}
 \*  {return '*';}
 /  {return '/';}
 //  {return TOKEN.COMMENT;}
-[:-`]   {return TOKEN.ERROR;}
+[:-`]  {return TOKEN.ERROR;}
 %%

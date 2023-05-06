@@ -153,7 +153,6 @@ function flex(
           //   break;
           case "\\":
             // support translate character
-            console.log(8888824, pattern[i + 1]);
             if (!squareBracketMode) {
               let node;
               if (pattern[i + 1] === "s") {
@@ -185,7 +184,6 @@ function flex(
                 stack.push(pattern[i]);
               }
             } else {
-              console.log(pattern[i])
               const node = new VertexNode(Graph.node_id, pattern[i]);
               graph.addVertexNode(node, node.index);
               stack.push(node);
@@ -203,7 +201,6 @@ function flex(
 
       let start = stack.pop();
       if (deepth === 0) {
-        console.log(getEndofPath(start as VertexNode).index);
         leafs.push({
           index: getEndofPath(start as VertexNode).index,
           action: new Function("yytext", "TOKEN", action),
@@ -218,6 +215,7 @@ function flex(
       return start;
     }
     const start = test(pattern, outer);
+    console.log(111, start)
     if (!node?.firstEdge) {
       node.firstEdge = new Node(
         (start as VertexNode).index,

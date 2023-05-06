@@ -238,6 +238,22 @@ export class Assign_Class extends Expression_Class {
   }
 }
 
+export class Bool_Class extends Expression_Class {
+  public token: string;
+  constructor(token: string) {
+    super();
+    this.token = token === 'True' ? '1' : '0';
+  }
+
+  transverse() {
+    success('开始遍历常量: ');
+    console.log(this.token);
+    if (this.next) {
+      this.next.transverse();
+    }
+  }
+}
+
 
 export class Int_Contant_Class extends Expression_Class {
   public token: string; // 常量

@@ -3,6 +3,7 @@ import { success } from "../utils";
 import {
   Add_Class,
   Assign_Class,
+  Bool_Class,
   Branch_Class,
   Caller_Class,
   Cond_Class,
@@ -193,12 +194,14 @@ export function switchCase(
       res = new Assign_Class(yyvalsp[2][2], yyvalsp[3][2], yyvalsp[0]);
       break;
     case key2production[13]:
+      console.log("++++++", yyvalsp);
       res = new Add_Class(yyvalsp[2], yyvalsp[0]);
       break;
     case key2production[29]:
       res = new Sub_Class(yyvalsp[2], yyvalsp[0]);
       break;
     case key2production[30]:
+      console.log("***********");
       res = new Mul_Class(yyvalsp[2], yyvalsp[0]);
       break;
     case key2production[31]:
@@ -263,6 +266,12 @@ export function switchCase(
       break;
     case key2production[28]:
       res = yyvalsp[1];
+      break;
+    case key2production[32]:
+      res = new Bool_Class(yyvalsp[0][2]);
+      break;
+    case key2production[33]:
+      res = yyvalsp[0];
       break;
   }
   return res;
