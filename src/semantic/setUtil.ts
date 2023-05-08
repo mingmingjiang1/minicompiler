@@ -140,7 +140,7 @@ export function switchCase(
   yyvalsp: any[]
 ) {
   let res, tmp;
-  success("本次规约动作: ", production);
+  success("本次规约动作: ", production.lfh + '->' + production.rfh);
   switch (production.lfh + "->" + production.rfh.join(" ")) {
     case key2production[0]:
       // todo

@@ -119,7 +119,7 @@ function cgenBase() {
       // 数据段
       padding: 0,
       key: "data",
-      content: ".data\n\n",
+      content: ".data\nnewLine:  .asciiz \"\\n\"\n",
       value: {},
     },
     {
@@ -168,7 +168,7 @@ function cgenEnd(data: Data[] = []) {
   return res;
 }
 
-export function cgenProgram(e: Program_Class) {
+export function cgenProgram(e: Program_Class, fileName: string, rootDir: string) {
   // 初始化data and text, code gen entry
   const data = cgenBase();
   cgenPrintFunction(data);
@@ -187,8 +187,9 @@ syscall
 
     */
   const content = cgenEnd(data);
+  console.log(fileName, 7777775464, `${rootDir}/${fileName.split('/')[fileName.split('/').length - 1]}`)
   fs.writeFileSync(
-    "/Users/bytedance/Desktop/icompiler/src/assemble/genAss2.s",
+    `${rootDir}/${fileName.split('/')[fileName.split('/').length - 1]}`,
     content
   );
 }
@@ -790,7 +791,7 @@ export function cgenPrintFunction(data: Data[]) {
     children = target.children;
     res += "move $30, $29\nsw $31, 0($29)\naddiu $29, $29, -4\n"; // return addr 放在栈顶
   }
-  res += `lw $a0, 8($29)\nli $v0, 1\nsyscall\n`;
+  res += `lw $a0, 8($29)\nli $v0, 1\nsyscall\nla $a0, newLine  \nli $v0, 4\nsyscall\n`;
   res += `lw $31, 4($29)\naddiu $29, $29, ${
     1 * 4 + 8
   }\nlw $30, 0($29)\njr $31\n`;

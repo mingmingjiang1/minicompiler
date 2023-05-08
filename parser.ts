@@ -277,7 +277,6 @@ export function scan(input: string) {
     if(!startState || !trans[startState?.key]?.[code]) {
       const target = preState.ind.find((item) => endStates.some(state => state.index === item));
       // console.log(endStates.find(state => state.index === target), `() => ${endStates.find(state => state.index === target).action}`)
-      console.log(target, preState)
       // console.log(eval(`() => ${endStates.find(state => state.index === target).action}`)());
       error('该节点不存在对应输入的出边，上一个状态key%s，第%s个字符，%s： ', preState.key, i, input[i], code);
       console.log(chalk.blue('可能该节点是叶子节点，也有可能是该节点确实是个死胡同'));
@@ -295,19 +294,16 @@ export function scan(input: string) {
     }
     yylength += 1, yytext += input[i];
     if (input[i] === '\n') {
-      console.log(input[i], i, 777777)
       number_line += 1;
     }
     i += 1;
   }
-  console.log(startState.ind, endStates)
   const target = startState.ind.find((item) => endStates.some(state => state.index === item));
   if (target) {
     tokens.push(TOKENMAP[leafs[target] as TOKEN] === undefined ? [number_line, '', input[i-1]] : [number_line, TOKENMAP[leafs[target] as TOKEN], input[i-1]]);
   } else {
     throw new Error(`Uncaught SyntaxError: Unexpected token ${input[i-1]}`);
   }
-  console.log(999999, tokens);
   success("tokens stream: ", tokens.filter(item => item[1] !== 'WHITE').map(item => TOKENMAP2[item[1]] === undefined ? item : TOKENMAP2[item[1]]));
   return tokens.filter(item => item[1] !== 'WHITE').map(item => TOKENMAP2[item[1]] === undefined ? item : TOKENMAP2[item[1]]);
 }

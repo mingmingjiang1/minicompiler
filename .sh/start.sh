@@ -2,7 +2,9 @@
 
 echo $1
 
-npm run compile --file $1
+echo $(pwd)
+
+npm run compile --file $1 $(pwd)
 
 # /Users/bytedance/.nvm/versions/node/v14.20.0/bin/npm i && npm run compile
 

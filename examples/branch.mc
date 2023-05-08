@@ -2,7 +2,7 @@
 
 int main() {
   int x = test(82);
-  print(x);
+  print(x); // 1200
 }
 
 int test(int x) {

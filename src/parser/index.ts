@@ -165,7 +165,6 @@ export function scan(input: string) {
       }
       continue;
     }
-    console.log('99999', input[i], preToken);
     let code: number;
     code = atoi(input[i]);
     // 特殊判断

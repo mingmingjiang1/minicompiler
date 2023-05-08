@@ -14,5 +14,5 @@ int sum(int x, int y) {
 
 int main() {
   int x = total(10);
-  print(x);
+  print(x); // 55
 }

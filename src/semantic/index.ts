@@ -23,7 +23,7 @@ import { success } from "../utils";
 import { key2production, test as production2key } from "./enum";
 import { cloneDeep, isEqual } from "lodash";
 import { switchCase } from "./setUtil";
-import { checkMain } from "./check";
+import { semanticmMain } from "./check";
 
 const fs = require("fs");
 
@@ -324,7 +324,9 @@ class Parser {
     // 3 若存在一个表达式 X -> ABCD 则 Follow(A) 需要加上 First(B) - ε，若First(B) 包含 ε，则Follow(A) 需要加上 First(C) - ε，向右迭代... 迭代至表达式结束。
     for (const nts of this.nonTerminalSymbol) {
       for (let grammarArr of this.lfh2rfh.get(nts)) {
-      
+        if (_nts === 'Arigthm' || _nts === 'Token') {
+          console.log(7777, grammarArr, _nts)
+        }
         const len = grammarArr.value.length;
         let index = -1;
         // 找到 B
@@ -332,6 +334,7 @@ class Parser {
           const ch = grammarArr.value[i];
           if (ch === _nts) {
             index = i;
+            console.log('++++', ch, _nts)
             break;
           }
         }
@@ -340,10 +343,15 @@ class Parser {
           const ch = grammarArr.value[index + 1];
           if (this.terminalSymbol.has(ch)) {
             // 终结符直接加入
+            console.log('------', ch)
             this._followSet[_nts].add(ch);
             break;
           } else {
             const set = this._firstSet[ch];
+            // if (_nts === 'Arigthm' || _nts === 'Token') {
+            //   console.log(77771, set)
+            // }
+            
             // const set2 = this._followSet[ch];
             // console.log(8888, set);
             // if (set.size === 0) {
@@ -367,6 +375,9 @@ class Parser {
         const ch = grammarArr.value[i];
         if (this.terminalSymbol.has(ch)) break;
         const newSet = this._followSet[ch];
+        if (_nts === 'Arigthm' || ch === 'Token') {
+          console.log(77772, newSet, ch, set, _nts)
+        }
         for (let v of Array.from(set)) {
           if (!newSet) {
             // this._followSet[ch].add();
@@ -516,6 +527,7 @@ class Parser {
       let curAction;
       curAction = this.table[input[i][1]][curState] as string;
       if (!curAction) {
+        console.log(curState)
         throw new Error(
           `syntax error at line ${input[i][0]}: unexpected token ${input[i][2]}`
         );
@@ -701,6 +713,7 @@ class Parser {
 
 function main() {
   const targetFile = process.argv[2];
+  const rootDir = process.argv[3];
   const data = fs.readFileSync(`${targetFile}`);
   const tokens = scan(data.toString());
   const parser = new Parser();
@@ -730,6 +743,7 @@ function main() {
     TOKEN.ELSE,
     TOKEN.IF,
     TOKEN.COND,
+    TOKEN.BOOL
   ]);
 
   Object.entries(production2key).forEach(([production, index]) => {
@@ -742,8 +756,8 @@ function main() {
   console.dir(ast, { depth: null });
   if (ast) {
     ast.transverse();
-    cgenProgram(ast);
-    checkMain();
+    cgenProgram(ast, targetFile, rootDir);
+    semanticmMain(ast);
   }
 }
 

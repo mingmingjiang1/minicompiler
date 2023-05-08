@@ -4,10 +4,10 @@ int main() {
   int x = test1();
   int m = test3();
   int n = test4();
-  print(y);
-  print(x);
-  print(m);
-  print(n);
+  print(y); // 13
+  print(x); // 8
+  print(m); // 15
+  print(n); // 3
   return y;
 }
 
