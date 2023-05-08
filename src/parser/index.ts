@@ -1,12 +1,14 @@
-import { atoi, error, idCnt, success } from "../../src/utils";
+import { atoi, idCnt, success } from "../../src/utils";
 import { readToken } from "./nfa";
 import { TOKEN } from "../type";
-const chalk = require('chalk');
 const fs = require("fs");
 
-let yytext = '', yylength = 0, number_line = 1;
+let yytext = "",
+  yylength = 0,
+  number_line = 1;
 
-const [edges, endStates] = readToken('./src/flex.p');
+const [edges, endStates] = readToken(__dirname + "/flex.p");
+
 
 // get target state node from source node state by edge c
 // 入参是某个节点
@@ -16,7 +18,10 @@ function getEndofEdges(state: number, c: number | null) {
   for (const edge of edges[state]) {
     if (edge === null || edge || (edge !== null && edge.length)) {
       // 说明存在边
-      if (edge === c || (edge !== null && edge.length >= 0 && edge?.includes(c))) {
+      if (
+        edge === c ||
+        (edge !== null && edge.length >= 0 && edge?.includes(c))
+      ) {
         res.push(i);
       }
     }
@@ -27,6 +32,8 @@ function getEndofEdges(state: number, c: number | null) {
   }
   return res;
 }
+
+const res = [];
 
 export function getClosure(S: number[], c: number | null) {
   const queue = [...S];
@@ -54,13 +61,13 @@ export function DFAedge(states: number[], c: number) {
 
 // spec test
 
-console.log(111, DFAedge([1, 4, 14, 9], atoi('i'))); // [ 2, 5, 8, 6 ]
-console.log(DFAedge([1, 4, 14, 9], atoi('g'))); // [ 5, 8, 6 ]
-console.log(DFAedge([2, 5, 15, 8, 6], atoi('f'))); // [ 3, 7, 8, 6 ]
-console.log(DFAedge([2, 5, 15, 8, 6], atoi('z'))); // [ 7, 8, 6 ]
-console.log(DFAedge([2, 5, 15, 8, 6], atoi('0'))); // [ 7, 8, 6 ]
-console.log(DFAedge([10, 11, 13, 15], atoi('0'))); // [ 12, 13, 11 ]
-console.log(DFAedge([1, 4, 14, 9], atoi('`'))); // [15]
+// console.log(111, DFAedge([1, 4, 14, 9], atoi("i"))); // [ 2, 5, 8, 6 ]
+// console.log(DFAedge([1, 4, 14, 9], atoi("g"))); // [ 5, 8, 6 ]
+// console.log(DFAedge([2, 5, 15, 8, 6], atoi("f"))); // [ 3, 7, 8, 6 ]
+// console.log(DFAedge([2, 5, 15, 8, 6], atoi("z"))); // [ 7, 8, 6 ]
+// console.log(DFAedge([2, 5, 15, 8, 6], atoi("0"))); // [ 7, 8, 6 ]
+// console.log(DFAedge([10, 11, 13, 15], atoi("0"))); // [ 12, 13, 11 ]
+// console.log(DFAedge([1, 4, 14, 9], atoi("`"))); // [15]
 // console.log(atoi(' '), DFAedge([1, 4, 9, 14], atoi(' '))); // [15]
 // console.log(DFAedge([1, 4, 9, 14], atoi('{'))); // [16]
 
@@ -95,26 +102,24 @@ function NFA2DFA(alpabets: number[], initState: number[]) {
   while (j <= p) {
     for (const char of alpabets) {
       const e = DFAedge(states[j].ind, char);
-      // console.log(e)
       // 如果存在这样的状态
       const [isExist, i] = isExisted(e, states);
-      // console.log(char, trans[j], isExist, j, trans.length)
       if (isExist) {
         trans[j][char] = states[i];
       } else {
         p = p + 1;
         // states[p] = e;
         // console.log(j, char)
-        if (e.includes(0)) {
-          // 说明是终态
-          const newE = {
-            isEnd: true,
-            ind: e,
-            path: [char],
-            key: p,
-          };
-          states[p] = newE;
-        } else {
+        // if (e.includes(0)) {
+        //   // 说明是终态
+        //   const newE = {
+        //     isEnd: true,
+        //     ind: e,
+        //     path: [char],
+        //     key: p,
+        //   };
+        //   states[p] = newE;
+        // } else {
           const newE = {
             isEnd: false,
             ind: e,
@@ -122,7 +127,7 @@ function NFA2DFA(alpabets: number[], initState: number[]) {
             key: p,
           };
           states[p] = newE;
-        }
+        // }
         trans[j][char] = states[p]; // trans[1][9] = 2, states[2] = []
       }
     }
@@ -131,8 +136,28 @@ function NFA2DFA(alpabets: number[], initState: number[]) {
   return trans;
 }
 
+
 // const trans = NFA2DFA(idCnt('\x00', '\x80'), [0, 3, 8, 13]);
-const trans = NFA2DFA([...idCnt('0', 'z'), atoi(' '), atoi('\n'), atoi('\t'), atoi('{'), atoi('}'), atoi('('), atoi(')'), atoi(','), atoi('-'), atoi('+'), atoi('*'), atoi('/')], getClosure([1], null))
+const trans = NFA2DFA(
+  [
+    ...idCnt("0", "z"),
+    atoi(" "),
+    atoi("\n"),
+    atoi("\t"),
+    atoi("{"),
+    atoi("}"),
+    atoi("("),
+    atoi(")"),
+    atoi(","),
+    atoi("-"),
+    atoi("+"),
+    atoi("*"),
+    atoi("/"),
+  ],
+  getClosure([1], null)
+);
+
+
 // // 后续在生成dfa的时候，如果存在叶子节点，且可能是多个nfa的叶子节点，需要优先级判断，以第一个nfa为基准
 export function scan(input: string) {
   let startState: {
@@ -155,11 +180,11 @@ export function scan(input: string) {
     key?: number;
   };
   let preToken;
-  let i  = 0;
+  let i = 0;
   while (i < input.length) {
     if (preToken === TOKEN.COMMENT) {
       i += 1;
-      if (input[i] === '\n') {
+      if (input[i] === "\n") {
         tokens.pop();
         preToken = undefined;
       }
@@ -170,8 +195,18 @@ export function scan(input: string) {
     // 特殊判断
     preState = startState;
     startState = trans[startState?.key][code];
-    if(!startState || !trans[startState?.key]?.[code]) {
-      const target = endStates.find(item => preState.ind.some(index => index === item.index));
+    if (!startState || !trans[startState?.key]?.[code]) {
+
+      const res = [];
+      for (const tt of endStates) {
+        if (preState.ind.some((index) => index === tt.index)) {
+          res.push(tt);
+        }
+      }
+
+      const target = endStates.find((item) =>
+        preState.ind.some((index) => index === item.index)
+      );
       // console.log(endStates.find(state => state.index === target), `() => ${endStates.find(state => state.index === target).action}`)
       // console.log(eval(`() => ${endStates.find(state => state.index === target).action}`)());
       // error('该节点不存在对应输入的出边，上一个状态key%s，第%s个字符，%s： ', preState.key, i, input[i], code);
@@ -179,55 +214,64 @@ export function scan(input: string) {
       if (target) {
         preToken = target.action(yytext, TOKEN);
         if (preToken === undefined) {
-          throw new Error(`the type from action ${target.action} is error: ${yytext}`);
+          throw new Error(
+            `the type from action ${target.action} is error: ${yytext}`
+          );
         }
-        if (yytext === '?') {
-          console.log(preToken, yytext)
+        if (yytext === "?") {
+          console.log(preToken, yytext);
         }
         tokens.push([number_line, preToken, yytext]);
         // tokens.push(TOKENMAP[leafs[target] as TOKEN] === undefined ? [number_line, '', input[i-1]] : [number_line, TOKENMAP[leafs[target] as TOKEN], yytext]);
-      } 
+      }
       startState = {
         ind: getClosure([1], null),
         isEnd: false,
         key: 1,
       };
-      yylength = 0, yytext = '';
+      (yylength = 0), (yytext = "");
       continue;
     }
-    yylength += 1, yytext += input[i];
-    if (input[i] === '\n') {
+    (yylength += 1), (yytext += input[i]);
+    if (input[i] === "\n") {
       number_line += 1;
     }
     i += 1;
   }
-  const target = endStates.find(item => startState.ind.some(index => index === item.index));
+  const target = endStates.find((item) =>
+    startState.ind.some((index) => index === item.index)
+  );
   if (target) {
-    tokens.push([number_line, target.action(yytext, TOKEN), yytext])
+    tokens.push([number_line, target.action(yytext, TOKEN), yytext]);
   } else {
-    throw new Error(`Uncaught SyntaxError: Unexpected token ${input[i-1]}`);
+    throw new Error(`Uncaught SyntaxError: Unexpected token ${input[i - 1]}`);
   }
 
-  console.log("tokens stream: ", tokens.filter(item => item[1] !== TOKEN.WHITE));
-  return tokens.filter(item => item[1] !== TOKEN.WHITE);
+  console.log(
+    "tokens stream: ",
+    tokens.filter((item) => item[1] !== TOKEN.WHITE)
+  );
+  return tokens.filter((item) => item[1] !== TOKEN.WHITE);
 }
-
 
 function isExisted(
   src: number[],
   targets: { path?: number[]; isEnd?: boolean; ind?: number[] }[]
 ): [boolean, number] {
-  const left = src.reduce((pre, item) => pre + (1 << item), 0);
+  // const left = src.reduce((pre, item) => pre + (1 << item), 0);
   let res: number;
   return [
     targets.some((item, index) => {
-      const right = item.ind.reduce((pre, m) => (1 << m) + pre, 0);
-      if (right === left) {
-        res = index;
+      // const right = item.ind.reduce((pre, m) => (1 << m) + pre, 0);
+      if (item.ind.length !== src.length) return false;
+      for (const i in item.ind) {
+        if (item.ind[i] !== src[i]) {
+          return false;
+        }
       }
-      return right === left;
+      res = index;
+      return true;
     }),
     res,
   ];
 }
-

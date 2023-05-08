@@ -59,7 +59,6 @@ let yytext = '', yylength = 0, number_line = 1;
 // edges[13][14] = idCnt(':', '`'); // idCnt(':', '`')
 
 const [edges, endStates] = readToken("./flex.p");
-console.log(endStates, 99999);
 
 // get target state node from source node state by edge c
 // 入参是某个节点
@@ -67,7 +66,6 @@ function getEndofEdges(state: number, c: number | null) {
   const res: number[] = [];
   let i = 0;
   for (const edge of edges[state]) {
-    // console.log(111, edge);
     if (edge === null || edge || (edge !== null && edge.length)) {
       // 说明存在边
       if (edge === c || (edge !== null && edge.length >= 0 && edge?.includes(c))) {

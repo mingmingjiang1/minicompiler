@@ -18,7 +18,7 @@ declare enum TOKEN {
 %%
 
 %%
-True|False  {return TOKEN.BOOL;}
+false|true  {return TOKEN.BOOL;}
 return  {return TOKEN.KEYWORD;}
 int|bool|void  {return TOKEN.TYPE;}
 else  {return TOKEN.ELSE;}

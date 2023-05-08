@@ -4,19 +4,26 @@
   "main": "index.ts",
   "scripts": {
     "test": "jest",
-    "start": "",
     "compile": "ts-node src/semantic/index.ts",
-    "mc": "spim -file src/assemble/genAss2.s"
+    "build": "tsc"
+  },
+  "directories": {
+    "bin": "./bin",
+    "example": "./examples"
+  },
+  "bin": {
+    "mccompiler": "./bin/cli.js",
+    "run": "./bin/run.sh"
   },
   "author": "life2die",
   "license": "ISC",
   "description": "an mini compiler for c-like language",
   "dependencies": {
     "chalk": "^4.1.2",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "shelljs": "^0.8.5"
   },
   "devDependencies": {
-    "@types/lodash-es": "^4.17.7",
     "@types/node": "^18.13.0",
     "jest": "^29.5.0",
     "ts-node": "^10.9.1"

@@ -4,6 +4,7 @@ import exp from "constants";
 import {
   Add_Class,
   Assign_Class,
+  Bool_Class,
   Branch_Class,
   Caller_Class,
   Cond_Class,
@@ -53,7 +54,7 @@ export function cgenParams(
   let res = "",
     tmp;
   // 逆转参数
-  console.log(declarations, 979797, params);
+  // console.log(declarations, 979797, params);
   while (e) {
     res += switchCase(e, data, params, declarations);
     res += "sw $a0, 0($29)\naddiu $29, $29, -4\n"; // 保存参数，但是这个参数可能是局部变量
@@ -187,9 +188,8 @@ syscall
 
     */
   const content = cgenEnd(data);
-  console.log(fileName, 7777775464, `${rootDir}/${fileName.split('/')[fileName.split('/').length - 1]}`)
   fs.writeFileSync(
-    `${rootDir}/${fileName.split('/')[fileName.split('/').length - 1]}`,
+    `${rootDir}/${fileName.split('/')[fileName.split('/').length - 1].replace(/mc/g, 's')}`,
     content
   );
 }
@@ -234,7 +234,6 @@ function cgenSub(
   params: string[],
   declarations?: Scope
 ) {
-  console.log(1212121, declarations, e);
   let res = "";
   res += switchCase(e.lvalue, data, params, declarations);
   res += `sw $a0, 0($29)\n`;
@@ -266,7 +265,6 @@ function cgenAdd(
 function cgenForIntContant(e: Int_Contant_Class, isBlock?: boolean) {
   // code gen for int const corresponding to using int
   let res = "";
-  console.log(77777, e.token);
   res += `li $a0, ${e.token}\n`;
   return res;
 }
@@ -283,7 +281,6 @@ function cgenForID(
   let ans;
   let offset = 0;
   // if (isBlock) {
-  //   console.log('block', blockDeclarations, declarations);
   //   const target = findTargetEle("data", data);
   //   // load id to $a0, x
   //   if (blockDeclarations.indexOf(e.token) !== -1) {
@@ -299,7 +296,6 @@ function cgenForID(
   //   }
   //   return res;
   // }
-  console.log("------", params, declarations);
   const target = findTargetEle("data", data);
   // load id to $a0, x
   // 说明是局部变量，
@@ -318,7 +314,6 @@ function cgenForID(
     res += `lw $a0, ${(ans.scope.indexOf(e.token) + offset + 1) * -4}($30)\n`;
     return res;
   }
-  console.log("ans", ans);
   if (params.indexOf(e.token) !== -1) {
     // 说明是参数
     res += `lw $a0, ${(params.indexOf(e.token) + 1) * 4}($30)\n`;
@@ -348,7 +343,7 @@ function cgenForIDDeclartion(
     res += cgenDiv(r, data, params, declarations);
   } else if (r instanceof Mul_Class) {
     res += cgenMul(r, data, params, declarations);
-  } else if (r instanceof Int_Contant_Class) {
+  } else if (r instanceof Int_Contant_Class || r instanceof Bool_Class) {
     res += cgenForIntContant(r); // 结果存到a0
   } else if (r instanceof Indentifier_Class) {
     res += cgenForID(r, data, params, declarations); // 结果存到a0
@@ -364,7 +359,6 @@ function cgenForIDDeclartion(
 
 // 获取局部变量的总的个数
 function getTotalVar(scopes: Scope) {
-  console.log(scopes, 9999);
   let cnt = 0;
   let cur = scopes;
   while (cur) {
@@ -427,7 +421,6 @@ export function cgenBranch(
     } else if (statementTrue instanceof Mul_Class) {
       resTrue += cgenMul(statementTrue, data, params, cur);
     } else if (statementTrue instanceof Assign_Class) {
-      console.log("if 语句", statementTrue, e);
       resTrue += cgenForIDDeclartion(statementTrue, data, params, cur);
       cur.scope.push(statementTrue.name);
     } else if (statementTrue instanceof Caller_Class) {
@@ -477,7 +470,6 @@ export function cgenBranch(
     } else if (statementFalse instanceof Mul_Class) {
       resFalse += cgenMul(statementFalse, data, params, cur);
     } else if (statementFalse instanceof Assign_Class) {
-      console.log("else 语句", statementFalse, e);
       resFalse += cgenForIDDeclartion(statementFalse, data, params, cur);
       cur.scope.push(statementFalse.name);
       // declarations.push(statementFalse.name);
@@ -490,13 +482,6 @@ export function cgenBranch(
       resFalse += cgenForID(statementFalse, data, params);
     } else if (statementFalse instanceof Branch_Class) {
       resFalse += cgenBranch(statementFalse, data, params, cur);
-      const target = findTargetEle("text", data);
-      if (target) {
-        console.log(
-          target.children.find((item) => item.key === `statement2`),
-          22222
-        );
-      }
     }
     statementFalse = statementFalse.next;
   }
@@ -659,7 +644,6 @@ function cgenCondition(
   return res;
 }
 
-let target: any;
 function switchCase(
   expr: Expression_Class,
   data: Data[] = [],
@@ -667,6 +651,7 @@ function switchCase(
   declarations?: Scope // 当前作用域
 ) {
   let res = "";
+  console.log(expr, 777)
   if (expr instanceof Sub_Class) {
     res += cgenSub(expr, data, params, declarations);
   } else if (expr instanceof Add_Class) {
@@ -680,14 +665,8 @@ function switchCase(
     declarations.scope.push(expr.name);
   } else if (expr instanceof Caller_Class) {
     res += cgenCaller(expr, data, params, declarations);
-    console.log(77777, declarations.scope);
   } else if (expr instanceof Return_Class) {
     res += cgenReturn(expr, data, params, declarations);
-    if (target) {
-      // 说明之前出现分支语句了
-      // target.content += res;
-      console.log(target.content, "++++++++", res);
-    }
   } else if (expr instanceof Indentifier_Class) {
     res += cgenForID(expr, data, params, declarations);
   } else if (expr instanceof Int_Contant_Class) {
@@ -761,7 +740,6 @@ export function cgenFunction(f: Function_Class, data: Data[]) {
     ); // 不可能是函数
   }
   // res += `lw $31, 4($29)\naddiu $29, $29, -${f.test.length * 4}\nlw $30, 0($29)\njr $31\n`; // 这里应该放置清空局部变量(n个)和参数以及return addr
-  console.log(11111, rootScope);
   if (f.return_type === "void") {
     res += `move $v0, $a0\n`;
     res += `addiu $29, $29, ${rootScope.scope.length * 4}\n`;

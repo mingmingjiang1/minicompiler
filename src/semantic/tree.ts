@@ -175,7 +175,7 @@ export class Bool_Class extends Expression_Class {
   public token: string;
   constructor(token: string) {
     super();
-    this.token = token === "True" ? "1" : "0";
+    this.token = token === "true" ? "1" : "0";
   }
 }
 

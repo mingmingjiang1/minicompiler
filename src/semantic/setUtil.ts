@@ -13,7 +13,6 @@ import {
   Indentifier_Class,
   Int_Contant_Class,
   Mul_Class,
-  Params_Class,
   Return_Class,
   Sub_Class,
 } from "./tree";

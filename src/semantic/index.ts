@@ -1,21 +1,6 @@
 import { scan } from "../../src/parser";
 import {
-  Add_Class,
-  Assign_Class,
-  Branch_Class,
-  Caller_Class,
-  Cond_Class,
-  Expression_Class,
-  Formal_Class,
-  Function_Class,
-  Indentifier_Class,
-  Int_Contant_Class,
-  Mul_Class,
-  Div_Class,
-  Params_Class,
   Program_Class,
-  Return_Class,
-  Sub_Class,
 } from "./tree";
 import { cgenProgram } from "../gen/codegen";
 import { TOKEN } from "../type";
@@ -24,6 +9,7 @@ import { key2production, test as production2key } from "./enum";
 import { cloneDeep, isEqual } from "lodash";
 import { switchCase } from "./setUtil";
 import { semanticmMain } from "./check";
+import path from "path";
 
 const fs = require("fs");
 
@@ -324,9 +310,6 @@ class Parser {
     // 3 若存在一个表达式 X -> ABCD 则 Follow(A) 需要加上 First(B) - ε，若First(B) 包含 ε，则Follow(A) 需要加上 First(C) - ε，向右迭代... 迭代至表达式结束。
     for (const nts of this.nonTerminalSymbol) {
       for (let grammarArr of this.lfh2rfh.get(nts)) {
-        if (_nts === 'Arigthm' || _nts === 'Token') {
-          console.log(7777, grammarArr, _nts)
-        }
         const len = grammarArr.value.length;
         let index = -1;
         // 找到 B
@@ -334,7 +317,6 @@ class Parser {
           const ch = grammarArr.value[i];
           if (ch === _nts) {
             index = i;
-            console.log('++++', ch, _nts)
             break;
           }
         }
@@ -343,7 +325,6 @@ class Parser {
           const ch = grammarArr.value[index + 1];
           if (this.terminalSymbol.has(ch)) {
             // 终结符直接加入
-            console.log('------', ch)
             this._followSet[_nts].add(ch);
             break;
           } else {
@@ -375,9 +356,6 @@ class Parser {
         const ch = grammarArr.value[i];
         if (this.terminalSymbol.has(ch)) break;
         const newSet = this._followSet[ch];
-        if (_nts === 'Arigthm' || ch === 'Token') {
-          console.log(77772, newSet, ch, set, _nts)
-        }
         for (let v of Array.from(set)) {
           if (!newSet) {
             // this._followSet[ch].add();
@@ -568,6 +546,7 @@ class Parser {
         return false;
       } else {
         success("sematic bingo!!!!");
+        
         return new Program_Class(yyvalsp[0]);
       }
     }
@@ -714,7 +693,9 @@ class Parser {
 function main() {
   const targetFile = process.argv[2];
   const rootDir = process.argv[3];
-  const data = fs.readFileSync(`${targetFile}`);
+  console.log(222, targetFile, rootDir, path.join(rootDir, targetFile));
+  const data = fs.readFileSync(path.join(rootDir, targetFile));
+  console.log(1111)
   const tokens = scan(data.toString());
   const parser = new Parser();
 

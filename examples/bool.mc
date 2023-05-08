@@ -5,6 +5,6 @@ int main() {
 
 
 bool test() {
-  bool isgood = True; // 如果是true，or false需要把它转为数字
+  bool isgood = false; // 如果是true，or false需要把它转为数字
   return isgood;
 }

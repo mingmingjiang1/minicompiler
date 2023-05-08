@@ -1,4 +1,5 @@
 const chalk = require("chalk");
+chalk.level = 1;
 
 export const findAllIndex = <T>(arr: T[], target: T): number[] => {
   const res: number[] = [];

@@ -125,7 +125,7 @@ export const test = {
   // ['Expressions' + "->" + transformRFH(['Expressions', 'Expression'])]:6,
   ['Expression' + "->" + transformRFH(['Caller'])]:6,
   ['Expression' + "->" + transformRFH(['Assign'])]: 7,
-  ['Expression' + "->" + transformRFH(['Arigthm' ])]: 8,
+  ['Expression' + "->" + transformRFH(['Arigthm'])]: 8,
   ['Expression' + "->" + transformRFH(['Condition'])]: 9,
   ['Expression' + "->" + transformRFH(['Return'])]: 10,
 
@@ -134,8 +134,13 @@ export const test = {
   ['Assign' + "->" + transformRFH([TOKEN.TYPE, TOKEN.ID, TOKEN.ASSIGN, 'Expression'])]: 12,
   ['Arigthm' + "->" + transformRFH(['Arigthm', '+', 'Token'])]: 13,
   ['Arigthm' + "->" +'Token']: 14,
-  ['Token' + "->" + TOKEN.ID]:15,
-  ['Token' + "->" + TOKEN.NUM]: 16,
+  // ['Token' + "->" + TOKEN.ID]:15,
+  // ['Token' + "->" + TOKEN.NUM]: 16,
+    // ['Arigthm' + '->' + 'Token']: 33,
+  // ['Token' + "->" +'Factor']: 33,
+  ['Factor' + "->" + TOKEN.BOOL]: 32,
+  ['Factor' + "->" + TOKEN.ID]:15,
+  ['Factor' + "->" + TOKEN.NUM]: 16,
   ['Condition' + "->" + transformRFH(['Expression', TOKEN.COND, 'Expression'])]: 17,
   ['Caller' + "->" + transformRFH([TOKEN.ID, '(', ')'])]: 18,
   ['Caller' + "->" + transformRFH([TOKEN.ID, '(', 'Params', ')'])]: 19,
@@ -150,8 +155,9 @@ export const test = {
   ['Statements' + "->" + transformRFH(['Statement'])]: 27,
   ['Statement' + "->" + transformRFH(['Expression', ';'])]: 28,
   ['Arigthm' + "->" + transformRFH(['Arigthm', '-', 'Token'])]: 29,
-  ['Arigthm' + "->" + transformRFH(['Arigthm', '*', 'Token'])]: 30,
-  ['Arigthm' + "->" + transformRFH(['Arigthm', '/', 'Token'])]: 31,
+  ['Token' + "->" + transformRFH(['Token', '*', 'Factor'])]: 30,
+  ['Token' + "->" + transformRFH(['Token', '/', 'Factor'])]: 31,
+  ['Token' + "->" +'Factor']: 33,
 }
 
 /* 
