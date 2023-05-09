@@ -12,6 +12,9 @@
       "noImplicitAny": true,
       "declaration": true,
       "esModuleInterop": true,
+      "allowJs": true
   },
-  "exclude": [ "build", "node_modules" ]
+  "exclude": [ "build", "node_modules" ],
+  "include": [ "libs/**/*" ],
+  "files": [ "bin/cli.js", "index.ts" ]
 }

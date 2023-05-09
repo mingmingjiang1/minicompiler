@@ -1,2 +1,11 @@
 # dependencies
 node_modules
+
+# bundle
+dist
+
+assemble
+
+build
+
+*.s
