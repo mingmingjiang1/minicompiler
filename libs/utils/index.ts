@@ -46,15 +46,14 @@ export const transformCharacter = (s: string) => {
 export const getWhiteChar = (s: string) => {
   switch (s) {
     case "s":
-      // 空白
+      // white
       return " ";
     case "t":
-      // 空白
+      // white
       return "\t";
     case "n":
-      // 空白
+      // white
       return "\n";
-    // 多+一个1
   }
   return s;
 };

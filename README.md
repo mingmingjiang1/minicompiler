@@ -1,15 +1,16 @@
 
-建议在linux上使用
+建议在linux上使用(推荐：Ubuntu20.04)
 
 ## prerequste:
-以下是Ubuntu20.04的命令
 1. spim sudo-apt install spim
 2. node: 需要14.0以上的版本
 3. npm sudo-apt install npm
 
+
 ## How to run ?
 1. 编译mc代码文件 => 汇编文件: ` npx mccompiler filename.mc ` 
 2. 执行汇编文件: ` npx run filename.s ` 
+3. 安装语法高亮插件：vscode插件市场搜索minic
 
 
 minic语法：
