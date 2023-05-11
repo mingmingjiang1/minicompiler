@@ -1,4 +1,7 @@
-const chalk = require("chalk");
+// const chalk = require("chalk");
+import chalk from "chalk";
+import fs from 'fs';
+// const fs = require("fs");
 chalk.level = 1;
 
 export const findAllIndex = <T>(arr: T[], target: T): number[] => {
@@ -57,3 +60,26 @@ export const getWhiteChar = (s: string) => {
   }
   return s;
 };
+
+export const readSemantic = (filename: string) => {
+  const data = fs.readFileSync(filename);
+  // /%%([\s\S]*)%%/g.test(data.toString());
+  const matchIterator = data.toString().matchAll(/%%([\s\S]*?)%%/g);
+  const matches: string[] = [];
+  for (const item of matchIterator) {
+    matches.push(item[1]);
+  }
+  const res: string[] = [];
+  console.log(matches[1], [...matches[1].matchAll(/(?:\S+\s*):\s*((?:[\s\S]+{[\s\S]+}\|?)+)/g)]);
+  // for (const item of matches[1].trim().split('\n')) {
+  //   if (/^\s*$/.test(item)) {
+  //     continue;
+  //   }
+  //   console.log(item, 111);
+  //   [...item.matchAll(/(\S+\s*):\s*((?:[\s\S]+{[\s\S]+}\|?)+)/g)]
+  //   // res.push(item.split(/\s/))
+  // }
+  console.log(1111, res);
+};
+
+readSemantic('./semantic.y')

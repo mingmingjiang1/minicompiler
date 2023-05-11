@@ -192,7 +192,6 @@ export function scan(input: string) {
     }
     let code: number;
     code = atoi(input[i]);
-    // 特殊判断
     preState = startState;
     startState = trans[startState?.key][code];
     if (!startState || !trans[startState?.key]?.[code]) {
@@ -207,10 +206,6 @@ export function scan(input: string) {
       const target = endStates.find((item) =>
         preState.ind.some((index) => index === item.index)
       );
-      // console.log(endStates.find(state => state.index === target), `() => ${endStates.find(state => state.index === target).action}`)
-      // console.log(eval(`() => ${endStates.find(state => state.index === target).action}`)());
-      // error('该节点不存在对应输入的出边，上一个状态key%s，第%s个字符，%s： ', preState.key, i, input[i], code);
-      // console.log(chalk.blue('可能该节点是叶子节点，也有可能是该节点确实是个死胡同'));
       if (target) {
         preToken = target.action(yytext, TOKEN);
         if (preToken === undefined) {

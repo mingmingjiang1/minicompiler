@@ -238,8 +238,6 @@ function flex(
   return [edges, leafs];
 }
 
-// flex([]);
-
 function build_edges(
   root: VertexNode,
   res: (number | string)[],
@@ -250,11 +248,7 @@ function build_edges(
   edges: any
 ) {
   // Union
-  // 建图，需要对or特殊处理，对于or，需要遍历其邻接表
-  // const edges = new Array(50).fill(0).map((item) => {
-  //   return new Array(128).fill(0);
-  // });
-  // 获取邻接表
+  // get  adj table
   res.push(root.index);
   path.push(root.edgeVal);
 

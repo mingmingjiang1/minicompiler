@@ -16,8 +16,8 @@ function main() {
   console.dir(ast, { depth: null });
   if (ast) {
     ast.transverse();
-    cgenProgram(ast, targetFile, rootDir);
     semanticCheck(ast);
+    cgenProgram(ast, targetFile, rootDir);
   }
 }
 
