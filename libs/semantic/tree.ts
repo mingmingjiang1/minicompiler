@@ -1,12 +1,11 @@
 /* 
-定义基本类：
-函数类：Function_Class(形式参数类，表达式，返回类型)
-形参类：Formal_Class
-表达式类：Expression_Class
-赋值语句类：Assign_Class
-函数调用类：Caller_Class
-整数常量类：Int_Constant_Class
-字符串类：String_Class
+function：Function_Class
+foramls：Formal_Class
+expressiom：Expression_Class
+assign：Assign_Class
+caller：Caller_Class
+int constant：Int_Constant_Class
+return: return_Class
 */
 export abstract class TreeNode {
   public next: TreeNode;
@@ -35,7 +34,6 @@ export class Expression_Class extends TreeNode {
   }
 }
 
-// 返回值语句类型
 export class Return_Class extends Expression_Class {
   public expr: Expression_Class;
   constructor(expr: Expression_Class) {
@@ -175,7 +173,7 @@ export class Bool_Class extends Expression_Class {
 }
 
 export class Int_Contant_Class extends Expression_Class {
-  public token: string; // 常量
+  public token: string;
   constructor(token: string) {
     super();
     this.token = token;
@@ -183,7 +181,7 @@ export class Int_Contant_Class extends Expression_Class {
 }
 
 export class Indentifier_Class extends Expression_Class {
-  public token: string; // 常量
+  public token: string;
   constructor(token: string) {
     super();
     this.token = token;

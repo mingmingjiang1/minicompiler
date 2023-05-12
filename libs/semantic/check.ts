@@ -1,13 +1,3 @@
-/* 
-## 六、语义分析
-在语义分析阶段可以做类型检查和基本的校验，这里放置了一些基本的类型检查动作：
-1. 必须要有main函数，main函数的返回值必须是整形
-2. 其他函数的返回值和实际返回值类型对应
-3. 赋值语句左右两侧类型一致
-4. 同一个作用域不得出现同名变量
-5. 变量必须先声明并初始化才能使用
-*/
-
 import _ from "lodash";
 import {
   Add_Class,
@@ -70,7 +60,7 @@ interface Scope {
 }
 
 const scopes: Scope = {
-  scope: [], // 最顶层是函数作用域
+  scope: [], // top scope
   next: [],
 };
 
@@ -252,7 +242,6 @@ function checkBranch(
   let { statementFalse, statementTrue } = expr;
   const { ifCond } = expr;
   checkCond(ifCond, ifCond.lExpr, ifCond.rExpr, scope, formal_list);
-  // ifCond里的变量是要声明过的
   const scopeTrue: Scope = {
     scope: [],
     next: [],
@@ -279,7 +268,7 @@ function checkAssign(
   scope: Scope,
   formal_list: { type: string; id: string }[]
 ) {
-  // cur scope,当前作用域
+  // current scope
   const { ltype, name, r } = expr;
   const target = scopes.scope.find((item) => item.name === name);
   if (target) {
@@ -327,9 +316,9 @@ function switchTest(
 }
 
 function checkFunc(f: Function_Class) {
-  // 生成函数作用域
+  // function scope
   const scopeRoot: Scope = {
-    scope: [], // 最顶层是函数作用域
+    scope: [], // top scope
     next: [],
   };
   let { expressions } = f;

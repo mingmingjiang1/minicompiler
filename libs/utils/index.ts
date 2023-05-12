@@ -37,10 +37,10 @@ export const error = (desc: string, ...rest: any[]) => {
   console.log(chalk.red.bold(`${desc}`) + chalk.white(...rest));
 };
 
-// 处理转义字符
+// deal with escape char
 export const transformCharacter = (s: string) => {
   if (s === "\\") {
-    // 说明是转义字符
+    // is escape char
     return true;
   }
   return false;

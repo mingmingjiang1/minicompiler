@@ -1,8 +1,6 @@
-import { scan } from "../parser";
 import {
   Program_Class,
 } from "./tree";
-import { cgenProgram } from "../gen/codegen";
 import { TOKEN } from "../type";
 import { success } from "../utils";
 import { key2production, test as production2key } from "./enum";
@@ -251,27 +249,6 @@ class Parser {
   }
 
   reduce() {}
-
-  // for (const rfh of this.lfh2rfh.get(lfh)) {
-  //   if (!this.isNonTermainl(rfh.value[0])) {
-  //     ans.push(rfh.value[0]);
-  //     // return ans;
-  //   } else {
-  //     for (const char of rfh.value) {
-  //       // 遍历所有非终结符
-  //       if (!this.lfh2rfh.get(char)) {
-  //         // 说明是终结符
-  //         continue;
-  //       }
-  //       const res = this.firstSet(char);
-  //       if (res.length) {
-  //         ans.push(...res);
-  //         break;
-  //         // return res;
-  //       }
-  //     }
-  //   }
-  // }
 
   _processFirst(nts: string, memo: Set<string>) {
     memo.add(nts);
