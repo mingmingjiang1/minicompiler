@@ -1,0 +1,6 @@
+libs/
+bin/
+.vscode/
+.gitignore
+tsconfig.json
+semantic.y

@@ -9,3 +9,5 @@ assemble
 build
 
 *.s
+
+semantic.y

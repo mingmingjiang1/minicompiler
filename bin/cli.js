@@ -32,8 +32,8 @@ version: ${version}
     console.log(chalk.green.bold("源文件不存在"));
     shell.exit(1);
   }
-  console.log(`${path.dirname(__dirname, "..")}`)
-  shell.exec(`${__dirname.includes('dist') ? 'node' : 'ts-node'} ${path.dirname(__dirname, "..")} ${
+
+  shell.exec(`node ${path.dirname(__dirname, "..")} ${
     process.argv[2]
   } ${shell.pwd()} > output.log`);
 }
