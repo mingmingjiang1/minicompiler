@@ -153,6 +153,7 @@ const trans = NFA2DFA(
     atoi("+"),
     atoi("*"),
     atoi("/"),
+    atoi("!"),
   ],
   getClosure([1], null)
 );
@@ -218,6 +219,8 @@ export function scan(input: string) {
         }
         tokens.push([number_line, preToken, yytext]);
         // tokens.push(TOKENMAP[leafs[target] as TOKEN] === undefined ? [number_line, '', input[i-1]] : [number_line, TOKENMAP[leafs[target] as TOKEN], yytext]);
+      } else {
+        throw new Error(`Uncaught SyntaxError: Unexpected token ${input[i]}`);
       }
       startState = {
         ind: getClosure([1], null),

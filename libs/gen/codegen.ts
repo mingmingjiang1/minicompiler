@@ -69,41 +69,6 @@ export function cgenExpressions(
   let res: string = "";
   while (e) {
     res += switchCase(e, data, params, declarations);
-    // if (e instanceof Sub_Class) {
-    //   res += cgenSub(e, data, params, declarations, isBlock, blockDeclarations);
-    // } else if (e instanceof Add_Class) {
-    //   res += cgenAdd(e, data, params, declarations, isBlock, blockDeclarations);
-    // } else if (e instanceof Div_Class) {
-    //   res += cgenDiv(e, data, params, declarations);
-    // } else if (e instanceof Mul_Class) {
-    //   res += cgenMul(e, data, params, declarations);
-    // } else if (e instanceof Function_Class) {
-    //   // 函数定义
-    //   cgenFunction(e, data); // 因为函数声明只能在最外层，所以这里面直接做了把函数定义放在了text里
-    // } else if (e instanceof Assign_Class) {
-    //   res += cgenForIDDeclartion(e, data, params, declarations, isBlock, blockDeclarations);
-    //   declarations.push(e.name);
-    // } else if (e instanceof Caller_Class) {
-    //   res += cgenCaller(e, data, params, declarations);
-    // } else if (e instanceof Return_Class) {
-    //   res += cgenReturn(e, data, params, declarations, isBlock, blockDeclarations);
-    // } else if (e instanceof Indentifier_Class) {
-    //   res += cgenForID(
-    //     e,
-    //     data,
-    //     params,
-    //     declarations,
-    //     0,
-    //     isBlock,
-    //     blockDeclarations
-    //   );
-    // } else if (e instanceof Branch_Class) {
-    //   res += cgenBranch(e, data, params, declarations);
-    // } else if (e instanceof Int_Contant_Class) {
-    //   res += cgenForIntContant(e);
-    // } else if (e instanceof Cond_Class) {
-    //   res += cgenCondition(e, data, params, declarations);
-    // }
     e = e.next;
   }
   return res;
@@ -115,7 +80,7 @@ function cgenBase() {
       // 数据段
       padding: 0,
       key: "data",
-      content: ".data\nnewLine:  .asciiz \"\\n\"\n",
+      content: '.data\nnewLine:  .asciiz "\\n"\n',
       value: {},
     },
     {
@@ -164,7 +129,11 @@ function cgenEnd(data: Data[] = []) {
   return res;
 }
 
-export function cgenProgram(e: Program_Class, fileName: string, rootDir: string) {
+export function cgenProgram(
+  e: Program_Class,
+  fileName: string,
+  rootDir: string
+) {
   // 初始化data and text, code gen entry
   const data = cgenBase();
   cgenPrintFunction(data);
@@ -176,7 +145,9 @@ export function cgenProgram(e: Program_Class, fileName: string, rootDir: string)
   // }
   const content = cgenEnd(data);
   fs.writeFileSync(
-    `${rootDir}/${fileName.split('/')[fileName.split('/').length - 1].replace(/mc/g, 's')}`,
+    `${rootDir}/${fileName
+      .split("/")
+      [fileName.split("/").length - 1].replace(/mc/g, "s")}`,
     content
   );
 }
@@ -545,7 +516,7 @@ export function cgenBranch(
       res += switchCase(rExpr, data, params);
       res += `lw $t0, 4($29)\n`;
       res += `addiu $29, $29, 4\n`;
-      res += `bnt	$t0, $a0, statement${cnt1}\nb statement${cnt2}\n`;
+      res += `bne	$t0, $a0, statement${cnt1}\nb statement${cnt2}\n`;
       break;
   }
 
@@ -625,6 +596,16 @@ function cgenCondition(
       res += `addiu $29, $29, 4\n`;
       res += `sub $a0, $t0, $a0\n`;
       res += `slt $a0, $a0, $zero\n`;
+      break;
+    case "!=":
+      res += switchCase(lExpr, data, params, declarations);
+      res += `sw $a0, 0($29)\n`;
+      res += `addiu $29, $29, -4\n`;
+      res += switchCase(rExpr, data, params, declarations);
+      res += `lw $t0, 4($29)\n`;
+      res += `addiu $29, $29, 4\n`;
+      res += `sub $a0, $t0, $a0\n`;
+      res += `sne $a0, $a0, $zero\n`;
       break;
   }
 
@@ -711,7 +692,7 @@ export function cgenFunction(f: Function_Class, data: Data[]) {
     scope: [], // 最顶层是函数作用域
     next: [],
   };
-  let res = f.name === 'main' ? `${f.name}:\n` : `f_${f.name}:\n`;
+  let res = f.name === "main" ? `${f.name}:\n` : `f_${f.name}:\n`;
   const { expressions, formals, formal_list } = f; // params是形式参
   const target = findTargetEle("text", data);
   let children;

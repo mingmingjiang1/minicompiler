@@ -8,6 +8,10 @@ assemble
 
 build
 
+output.log
+
 *.s
 
 semantic.y
+
+.DS_Store

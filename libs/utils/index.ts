@@ -82,4 +82,3 @@ export const readSemantic = (filename: string) => {
   console.log(1111, res);
 };
 
-readSemantic('./semantic.y')

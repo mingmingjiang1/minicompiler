@@ -253,14 +253,22 @@ function checkBranch(
     parent: scope,
   };
   scope.next.push(scopeTrue, scopeFalse);
+  let returnFlag1, returnFlag2;
+
   while (statementTrue) {
-    switchTest(statementTrue, scopeTrue, formal_list, return_type);
+    returnFlag1 = switchTest(statementTrue, scopeTrue, formal_list, return_type);
     statementTrue = statementTrue.next;
   }
   while (statementFalse) {
-    switchTest(statementFalse, scopeFalse, formal_list, return_type);
+    returnFlag2 = switchTest(statementFalse, scopeFalse, formal_list, return_type);
     statementFalse = statementFalse.next;
   }
+
+  if (typeof returnFlag1 !== "string" || typeof returnFlag2 !== "string") {
+    throw new Error("if-else内部必须有return语句");
+  }
+
+  return returnFlag1 && returnFlag2;
 }
 
 function checkAssign(
