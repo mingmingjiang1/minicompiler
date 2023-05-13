@@ -1,13 +1,13 @@
 import { atoi, idCnt, success } from "../utils";
 import { readToken } from "./nfa";
 import { TOKEN } from "../type";
-const fs = require("fs");
+const path = require("path");
 
 let yytext = "",
   yylength = 0,
   number_line = 1;
 
-const [edges, endStates] = readToken(__dirname + "/flex.p");
+const [edges, endStates] = readToken(path.join(__dirname, '../..') + "/flex.p");
 
 
 // get target state node from source node state by edge c

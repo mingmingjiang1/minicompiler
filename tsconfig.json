@@ -14,7 +14,6 @@
       "esModuleInterop": true,
       "allowJs": true
   },
-  "exclude": [ "build", "node_modules" ],
+  "exclude": [ "build", "node_modules", "builtin", "bin" ],
   "include": [ "libs/**/*" ],
-  "files": [ "bin/cli.js", "index.ts" ]
 }

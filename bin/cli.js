@@ -33,6 +33,7 @@ version: ${version}
     shell.exit(1);
   }
 
+
   shell.exec(`node ${path.dirname(__dirname, "..")} ${
     process.argv[2]
   } ${shell.pwd()} > output.log`);

@@ -4,3 +4,5 @@ bin/
 .gitignore
 tsconfig.json
 semantic.y
+output.log
+index.ts
