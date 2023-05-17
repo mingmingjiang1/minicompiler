@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/badge/blog-emoer-orange" align="left" /> 
 </center>
 
-
+<br/>
 
 > *This is a simple compiler named minicompiler  implemented in node js that include parser, syntax analysis and assembly code generation. The minicompiler* 
 
