@@ -1,6 +1,13 @@
 # minicompiler
 
-<center class="half"> <img align="left" src="https://img.shields.io/github/actions/workflow/status/mingmingjiang1/minicompiler/node.js.yml" /> <img align="left"  src="https://img.shields.io/badge/language-node.js-brightgreen" />    <img align="left" src="https://img.shields.io/badge/category-learning-yellowgreen"/><img src="https://img.shields.io/badge/blog-emoer-orange" align="left" /> </center>
+<center class="half"> 
+  <img align="left" 		src="https://img.shields.io/github/actions/workflow/status/mingmingjiang1/minicompiler/node.js.yml" /> 
+  <img align="left"  src="https://img.shields.io/badge/language-node.js-brightgreen" />    
+  <img align="left" src="https://img.shields.io/badge/category-learning-yellowgreen"/>
+  <img src="https://img.shields.io/badge/blog-emoer-orange" align="left" /> 
+</center>
+
+
 
 > *This is a simple compiler named minicompiler  implemented in node js that include parser, syntax analysis and assembly code generation. The minicompiler* 
 
