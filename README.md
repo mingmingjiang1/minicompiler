@@ -1,27 +1,46 @@
+# minicompiler
 
-建议在linux上使用(推荐：Ubuntu20.04)
+<center class="half"> <img align="left" src="https://img.shields.io/github/actions/workflow/status/mingmingjiang1/minicompiler/node.js.yml" /> <img align="left"  src="https://img.shields.io/badge/language-node.js-brightgreen" />    <img align="left" src="https://img.shields.io/badge/category-learning-yellowgreen"/><img src="https://img.shields.io/badge/blog-emoer-orange" align="left" /> </center>
 
-## prerequste:
-1. spim sudo-apt install spim
-2. node: 需要14.0以上的版本
-3. npm sudo-apt install npm
+> *This is a simple compiler named minicompiler  implemented in node js that include parser, syntax analysis and assembly code generation. The minicompiler* 
+
+
+
+💡： *Recommended for running on linux*
+
+
+
+## Prerequste:
+
+1. spim:  `sudo-apt install spim`
+2. *node: support at least version 14.0.0*
+3. npm: `npm sudo-apt install npm`
+
+
 
 
 ## How to run ?
-1. 编译mc代码文件 => 汇编文件: ` npx mccompiler filename.mc ` 
-2. 执行汇编文件: ` npx run filename.s ` 
-3. 安装语法高亮插件：vscode插件市场搜索minic
+1. *Create file named  `*.mc`  and execute*  ` npx mccompiler *.mc `  
+2. *Run assembly file:*  ` npx run *.s ` 
+3. *Install the syntax highlighting plugin：Vscode plugin Marketplace search minic and install*
 
 
-minic语法：
-1. 运算符：支持+-*/运算，支持逻辑运算，不支持运算符结合，如：(2 + 3) * 10
-2. 类型：支持自然数(int类型)，布尔值以及void
-3. 语句：支持函数调用，嵌套的if-else语句(嵌套的if-else语句，注：if-else里必须有return语句，否则会有一些出乎意料的错误)
-4. 和C一样，必须要有main函数
-5. 变量必须声明的时候同时赋值
-6. 内置print函数
 
-eg：
+## **minic syntax：**
+
+1. *Operator: Support  `+-*/` operation, support logical operation, do not support operator combination, such as:  `(2 + 3) * 10*`*
+2. *Type: Supports natural numbers (int), boolean, and void*
+3. *Statements: Support function calls, nested if-else statements (nested if-else statements, note: if-else must have a return statement, otherwise there will be some unexpected errors)*
+4. *Like C, you must have main function* 
+5. *Assign values to variables when they must be declared*
+6. *Built-in Print function*
+
+
+
+## **Examples**
+
+*example 1:*
+
 ```c
 int main() {
   int x = sum(2, 3);
@@ -31,7 +50,87 @@ int main() {
 int sum(int x, int y) {
   return x + y;
 }
+
 ```
+
+
+
+*example 2:*
+
+```c
+int main() {
+  int y = test2();
+  int x = test1();
+  int m = test3();
+  int n = test4();
+  print(y); // 13
+  print(x); // 8
+  print(m); // 15
+  print(n); // 3
+  return y;
+}
+
+int test1() {
+  return 2 + 2 * 3;
+}
+
+int test2() {
+  return 2 + 2 * 3 + 5;
+}
+
+int test3() {
+  return 2 * 2 + 3 + 8;
+}
+
+int test4() {
+  return 2 / 2 * 3;
+}
+```
+
+*example 3:*
+
+```c
+int total(int x) {
+  if (x == 0) {
+    return x;
+  } else {
+    int m = total(x - 1);
+    return x + m;
+  }
+}
+
+int sum(int x, int y) {
+  return x + y;
+}
+
+
+int main() {
+  int x = total(10);
+  print(x); // 55
+}
+```
+
+*example 4:*
+
+```c
+int main() {
+  print(test(3)); // 1
+  return 0;
+}
+
+
+bool test(int x) {
+  return x != 2;
+}
+
+bool test2(int x) {
+  return x > 2;
+}
+```
+
+
+
+> 💗：*The author has limited energy and there may be many inadequacies in consideration. If there are any bugs, please contact the author in a timely manner. For the sake of simplicity, the code style of this implementation is not very good.*
 
 
 
