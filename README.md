@@ -37,9 +37,9 @@
 
 ## **minic syntax：**
 
-1. *Operator: Support  `+-*/` operation, support logical operation, do not support operator combination, such as:  `(2 + 3) * 10*`*
+1. *Operator: Support  `+-*/` operation, support logical operation, also support operator combination, such as:  `(2 + 3) * 10`*
 2. *Type: Supports natural numbers (int), boolean, and void*
-3. *Statements: Support function calls, nested if-else statements (nested if-else statements, note: if-else must have a return statement, otherwise there will be some unexpected errors)*
+3. *Statements: Support function calls, nested if-else statements (nested if-else statements)*
 4. *Like C, you must have main function* 
 5. *Assign values to variables when they must be declared*
 6. *Built-in Print function*
