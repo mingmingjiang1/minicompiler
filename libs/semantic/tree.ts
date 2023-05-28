@@ -1,3 +1,5 @@
+import { Scope } from "./check";
+
 /* 
 function：Function_Class
 foramls：Formal_Class
@@ -21,7 +23,7 @@ export abstract class TreeNode {
 }
 
 export class Program_Class extends TreeNode {
-  public expr: Expression_Class;
+  public expr: Function_Class;
   constructor(func: Function_Class) {
     super();
     this.expr = func;
@@ -52,7 +54,13 @@ export class Caller_Class extends Expression_Class {
     this.params = params;
     this.next = next;
     while (params) {
-      this.params_list.unshift((params as any).token);
+      if (params instanceof Int_Contant_Class) {
+        this.params_list.unshift(params.token);
+      } else if (params instanceof Indentifier_Class) {
+        this.params_list.unshift(params.token);
+      } else if (params instanceof Caller_Class) {
+        this.params_list.unshift(params.id);
+      }
       params = params.next as any;
     }
   }
@@ -72,12 +80,14 @@ export class Function_Class extends Expression_Class {
   public formals: Formal_Class; // 形参
   public return_type: string; //函数名
   public formal_list: { type: string; id: string }[] = [];
+  public total?: number = 0;
+  public scope: Scope;
   constructor(
     returnType: string,
     name: string,
     formals?: Formal_Class,
     expressions?: Expression_Class,
-    next?: Expression_Class
+    next?: Function_Class
   ) {
     super();
     this.name = name;
@@ -110,7 +120,7 @@ export class Branch_Class extends Expression_Class {
   constructor(
     ifCond: Cond_Class,
     statementTrue: Expression_Class,
-    statementFalse: Expression_Class
+    statementFalse?: Expression_Class
   ) {
     super();
     this.ifCond = ifCond;
@@ -146,7 +156,7 @@ export class Formal_Class extends Expression_Class {
   }
 }
 
-export class Assign_Class extends Expression_Class {
+export class Declare_Class extends Expression_Class {
   public name: string; // 左变量名字
   // public expr: Expression_Class;
   public ltype: string; // 左变量类型
@@ -160,6 +170,21 @@ export class Assign_Class extends Expression_Class {
     super();
     this.name = name;
     this.ltype = ltype;
+    this.r = r;
+  }
+}
+
+export class Assign_Class extends Expression_Class {
+  public name: Indentifier_Class; // 左变量名字
+  // public expr: Expression_Class;
+  public r: Expression_Class; // 右变量名字(可以是变量)
+  constructor(
+    name: Indentifier_Class,
+    r: Expression_Class,
+    next?: Expression_Class
+  ) {
+    super();
+    this.name = name;
     this.r = r;
   }
 }

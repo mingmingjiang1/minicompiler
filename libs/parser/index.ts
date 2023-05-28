@@ -1,4 +1,4 @@
-import { atoi, idCnt, success } from "../utils";
+import { atoi, errorMsg, idCnt, success } from "../utils";
 import { readToken } from "./nfa";
 import { TOKEN } from "../type";
 const path = require("path");
@@ -188,9 +188,11 @@ export function scan(input: string) {
       if (input[i] === "\n") {
         tokens.pop();
         preToken = undefined;
+      } else {
+        continue;
       }
-      continue;
     }
+    
     let code: number;
     code = atoi(input[i]);
     preState = startState;
@@ -211,7 +213,7 @@ export function scan(input: string) {
         preToken = target.action(yytext, TOKEN);
         if (preToken === undefined) {
           throw new Error(
-            `the type from action ${target.action} is error: ${yytext}`
+            errorMsg(`the type from action ${target.action} is error: ${yytext}`)
           );
         }
         if (yytext === "?") {
@@ -220,7 +222,7 @@ export function scan(input: string) {
         tokens.push([number_line, preToken, yytext]);
         // tokens.push(TOKENMAP[leafs[target] as TOKEN] === undefined ? [number_line, '', input[i-1]] : [number_line, TOKENMAP[leafs[target] as TOKEN], yytext]);
       } else {
-        throw new Error(`Uncaught SyntaxError: Unexpected token ${input[i]}`);
+        throw new Error(errorMsg(`Uncaught SyntaxError: Unexpected token ${input[i]}`));
       }
       startState = {
         ind: getClosure([1], null),
@@ -239,10 +241,14 @@ export function scan(input: string) {
   const target = endStates.find((item) =>
     startState.ind.some((index) => index === item.index)
   );
+
+
   if (target) {
     tokens.push([number_line, target.action(yytext, TOKEN), yytext]);
-  } else {
-    throw new Error(`Uncaught SyntaxError: Unexpected token ${input[i - 1]}`);
+  }  else if (preToken === TOKEN.COMMENT) {
+    tokens.pop();
+  }else {
+    throw new Error(errorMsg(`Uncaught SyntaxError: Unexpected token ${input[i - 1]}， ${number_line }`));
   }
 
   console.log(

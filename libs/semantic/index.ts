@@ -2,7 +2,7 @@ import {
   Program_Class,
 } from "./tree";
 import { TOKEN } from "../type";
-import { success } from "../utils";
+import { errorMsg, success } from "../utils";
 import { key2production, test as production2key } from "./enum";
 import { cloneDeep, isEqual } from "lodash";
 import { switchCase } from "./setUtil";
@@ -279,7 +279,6 @@ class Parser {
   }
 
   _processFollow(_nts: string) {
-    // console.log(_nts, 1111)
     // 3 若存在一个表达式 X -> ABCD 则 Follow(A) 需要加上 First(B) - ε，若First(B) 包含 ε，则Follow(A) 需要加上 First(C) - ε，向右迭代... 迭代至表达式结束。
     for (const nts of this.nonTerminalSymbol) {
       for (let grammarArr of this.lfh2rfh.get(nts)) {
@@ -480,7 +479,7 @@ class Parser {
       if (!curAction) {
         console.log(curState)
         throw new Error(
-          `syntax error at line ${input[i][0]}: unexpected token ${input[i][2]}`
+          errorMsg(`syntax error at line ${input[i][0]}: unexpected token ${input[i][2]}`)
         );
       }
       if (/s(\d+)/.test(curAction)) {
@@ -518,7 +517,7 @@ class Parser {
       } else if (!curAction) {
         return false;
       } else {
-        success("文法解析成功(sematic bingo!!!!)，生成的ast如下：");
+        success("syntax analysis succes，ast structure as bellow：");
         
         return new Program_Class(yyvalsp[0]);
       }

@@ -6,6 +6,7 @@ import {
   Branch_Class,
   Caller_Class,
   Cond_Class,
+  Declare_Class,
   Div_Class,
   Formal_Class,
   Function_Class,
@@ -77,7 +78,7 @@ export function switchCase(
       res = new Return_Class(yyvalsp[0]);
       break;
     case key2production[12]:
-      res = new Assign_Class(yyvalsp[2][2], yyvalsp[3][2], yyvalsp[0]);
+      res = new Declare_Class(yyvalsp[2][2], yyvalsp[3][2], yyvalsp[0]);
       break;
     case key2production[13]:
       res = new Add_Class(yyvalsp[2], yyvalsp[0]);
@@ -156,6 +157,18 @@ export function switchCase(
       break;
     case key2production[33]:
       res = yyvalsp[0];
+      break;
+    case key2production[34]:
+      res = new Assign_Class(new Indentifier_Class(yyvalsp[2][2]), yyvalsp[0]);
+      break;
+    case key2production[35]:
+      res = yyvalsp[1];
+      break;
+    case key2production[36]:
+      res = yyvalsp[0];
+      break;
+    case key2production[37]:
+      res = new Branch_Class(yyvalsp[2], yyvalsp[0]);
       break;
   }
   return res;

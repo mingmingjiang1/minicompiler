@@ -1,6 +1,8 @@
 // const chalk = require("chalk");
 import chalk from "chalk";
 import fs from 'fs';
+import { Data } from "../gen/codegen";
+import { Branch_Class, Expression_Class } from "../semantic/tree";
 // const fs = require("fs");
 chalk.level = 1;
 
@@ -36,6 +38,8 @@ export const success = (desc: string, ...rest: any[]) => {
 export const error = (desc: string, ...rest: any[]) => {
   console.log(chalk.red.bold(`${desc}`) + chalk.white(...rest));
 };
+
+export const errorMsg = chalk.bold.red;
 
 // deal with escape char
 export const transformCharacter = (s: string) => {
@@ -82,3 +86,24 @@ export const readSemantic = (filename: string) => {
   console.log(1111, res);
 };
 
+export function hasBranch(e: Expression_Class) {
+  while (e) {
+    if (e instanceof Branch_Class) return true;
+    e = e.next;
+  }
+  return false;
+}
+
+export function findTargetEle(key: string, data: Data[] = []): false | Data {
+  for (const item of data) {
+    const { padding, key: cnt, children } = item;
+    if (key === cnt) {
+      return item;
+    }
+    const res = findTargetEle(key, children);
+    if (res) {
+      return res;
+    }
+  }
+  return false;
+}
