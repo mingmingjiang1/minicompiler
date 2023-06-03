@@ -9,10 +9,10 @@ int multibranch(int x, int y) {
   print(x); // 6
   print(y); // 5
   if (x + y == 10) {
-    int x = 2222;
     return x + y;
   } else {
     return 100;
   }
+  return 700;
 }
 

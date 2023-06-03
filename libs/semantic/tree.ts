@@ -10,7 +10,7 @@ int constant：Int_Constant_Class
 return: return_Class
 */
 export abstract class TreeNode {
-  public next: TreeNode;
+  abstract next?: TreeNode;
   constructor() {}
 
   beforeTransvrse() {}
@@ -24,6 +24,7 @@ export abstract class TreeNode {
 
 export class Program_Class extends TreeNode {
   public expr: Function_Class;
+  public next?: TreeNode;
   constructor(func: Function_Class) {
     super();
     this.expr = func;
@@ -31,6 +32,7 @@ export class Program_Class extends TreeNode {
 }
 
 export class Expression_Class extends TreeNode {
+  public next: Expression_Class;
   constructor() {
     super();
   }
@@ -61,12 +63,13 @@ export class Caller_Class extends Expression_Class {
       } else if (params instanceof Caller_Class) {
         this.params_list.unshift(params.id);
       }
-      params = params.next as any;
+      params = params.next;
     }
   }
 }
 
 export class Expressions_Class extends TreeNode {
+  public next: TreeNode;
   constructor(next: Expression_Class) {
     super();
   }
@@ -74,7 +77,8 @@ export class Expressions_Class extends TreeNode {
   transverse(...args: any[]): void {}
 }
 
-export class Function_Class extends Expression_Class {
+export class Function_Class extends TreeNode {
+  public next: Function_Class;
   public name: string; //函数名
   public expressions: Expression_Class; // 表达式
   public formals: Formal_Class; // 形参
@@ -97,7 +101,7 @@ export class Function_Class extends Expression_Class {
     this.return_type = returnType;
     while (formals) {
       this.formal_list.unshift({ type: formals.type, id: formals.name });
-      formals = formals.next as any;
+      formals = formals.next;
     }
   }
 }
@@ -148,6 +152,7 @@ export class Cond_Class extends Expression_Class {
 export class Formal_Class extends Expression_Class {
   public name: string; //参数名
   public type: string; //参数类型
+  public next: Formal_Class;
   constructor(name: string, type: string, next?: Formal_Class) {
     super();
     this.name = name;
@@ -193,7 +198,7 @@ export class Bool_Class extends Expression_Class {
   public token: string;
   constructor(token: string) {
     super();
-    this.token = token === "true" ? "1" : "0";
+    this.token = token === 'true' ? '1' : '0';
   }
 }
 

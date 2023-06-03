@@ -15,7 +15,7 @@ function main() {
   const ast = parser.trace(tokens);
   console.dir(ast, { depth: null });
   if (ast) {
-    ast.transverse();
+    ast?.transverse();
     semanticCheck(ast);
     cgenProgram(ast, targetFile, rootDir);
   }

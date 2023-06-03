@@ -48,7 +48,7 @@ export const BGT = (label: string) => `       bgt $t0, $a0, ${label}\n`;
 
 export const BLE = (label: string) => `       ble $t0, $a0, ${label}\n`;
 
-export const BLT = (label: string) => `       blt $t0, $a0, ${label}\n`;
+export const BLT = (label: string) => `       ble $t0, $a0, ${label}\n`;
 
 export const BNE = (label: string) => `       bne $t0, $a0, ${label}\n`;
 

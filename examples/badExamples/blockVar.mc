@@ -9,7 +9,7 @@ int test1 (int x) {
   if (x == 10) {
     return 12;
   } else {
-    int x = 10;
+    int x = 10; // error: Cant't declare block variable
   }
   print(1);
   return x;

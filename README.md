@@ -39,10 +39,11 @@
 
 1. *Operator: Support  `+-*/` operation, support logical operation, also support operator combination, such as:  `(2 + 3) * 10`*
 2. *Type: Supports natural numbers (int), boolean, and void*
-3. *Statements: Support function calls, nested if-else statements (nested if-else statements)*
+3. *Statements: Support function calls, nested if-else statements*
 4. *Like C, you must have main function* 
 5. *Assign values to variables when they must be declared*
 6. *Built-in Print function*
+7. *Each path of a function must have a return value*
 
 
 

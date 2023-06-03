@@ -1,5 +1,5 @@
 int main() {
-  print(add(add(total(10), 3), add(total(10), 3))); // 1
+  print(add(add(total(10), 3), add(total(10), 3))); // 116
   return 0;
 }
 
@@ -12,7 +12,7 @@ int total(int x) {
   if (x == 0) {
     return x;
   } else {
-    int m = total(x - 1);
-    return x + m;
+    return x + total(x - 1);
   }
+  return 900;
 }

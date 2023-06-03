@@ -1,5 +1,8 @@
 int main() {
   print(test(3)); // 1
+  print(test(2)); // 0
+  print(test2(10)); // 1
+  print(test2(1)); // 0
   return 0;
 }
 
