@@ -8,8 +8,10 @@ assemble
 
 build
 
+# log
 output.log
 
+# assemble
 *.s
 
 semantic.y

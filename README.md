@@ -44,6 +44,7 @@
 5. *Assign values to variables when they must be declared*
 6. *Built-in Print function*
 7. *Each path of a function must have a return value*
+7. *Also support condition expression, like `return x > 10`*
 
 
 

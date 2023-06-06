@@ -3,7 +3,7 @@ import {
 } from "./tree";
 import { TOKEN } from "../type";
 import { errorMsg, success } from "../utils";
-import { key2production, test as production2key } from "./enum";
+import { key2production, ex as production2key } from "./enum";
 import { cloneDeep, isEqual } from "lodash";
 import { switchCase } from "./setUtil";
 
@@ -151,7 +151,7 @@ class Parser {
   constructor() {
     this.table = {};
     this.states = new Map();
-    this.statesReverse = new Map([["EP$", 0]]);
+    this.statesReverse = new Map([]);
     this.lfh2rfh = new Map([]);
     this.ind = 0;
   }
@@ -168,7 +168,7 @@ class Parser {
       this.nonTerminalSymbol.add(lfh);
     }
     this.states.set(index, new Production(lfh, rfh));
-    this.statesReverse.set(lfh + rfh, index);
+    this.statesReverse.set(lfh + ':' + rfh.join(' '), index);
     let tmp = this.lfh2rfh.get(lfh);
     if (!tmp) {
       tmp = [];
@@ -218,10 +218,11 @@ class Parser {
                 _key = ind;
               }
             }
-            key += 1 << production2key[item.lfh + "->" + item.rfh];
+            // key += 1 << production2key[item.lfh + "->" + item.rfh];
+            key += 1 << this.statesReverse.get(item.lfh + ':' + item.rfh.join(' '));
             // ptrKey += 1 << (0 + pre);
-            const ind = this.statesReverse.get(item.lfh + item.rfh);
-            ptrKey[ind] = "0";
+            const ind = this.statesReverse.get(item.lfh + ':' + item.rfh.join(' '));
+            ptrKey[ind] = '0';
             // pre += item.rfh.length;
             const tmp = new Item(0, _key, item.lfh, item.rfh);
             if (!hasTargetItem(I, tmp)) {
@@ -260,7 +261,6 @@ class Parser {
           this._firstSet[nts].add(ch);
           break;
         } else {
-          // console.log('----------, ', ch)
           if (i === 0 && ch === nts) {
             // 避免左递归
             break;
@@ -301,14 +301,10 @@ class Parser {
             break;
           } else {
             const set = this._firstSet[ch];
-            // if (_nts === 'Arigthm' || _nts === 'Token') {
-            //   console.log(77771, set)
-            // }
             
             // const set2 = this._followSet[ch];
-            // console.log(8888, set);
             // if (set.size === 0) {
-            //   // 如果first(ch) === 空
+            //   // if first(ch) === 空
             //   for (const v of Array.from(set2 || []))
             //   if (v !== EMPTY) this._followSet[_nts].add(v);
             // }
@@ -436,7 +432,6 @@ class Parser {
         filteredAns.push(item);
       }
     });
-    // console.log('ending', lfh, filteredAns)
     memo.set(lfh, filteredAns);
     return ans;
   }
@@ -477,7 +472,6 @@ class Parser {
       let curAction;
       curAction = this.table[input[i][1]][curState] as string;
       if (!curAction) {
-        console.log(curState)
         throw new Error(
           errorMsg(`syntax error at line ${input[i][0]}: unexpected token ${input[i][2]}`)
         );
@@ -537,7 +531,7 @@ class Parser {
     let ind = 2;
     const keys: any[] = [];
     const [startItems, key, ptrKey] = this.build_closure(
-      new Set([new Item(0, production2key["E->Program $"], "E", ["Program", "$"])])
+      new Set([new Item(0, this.statesReverse.get('E:Program'), 'E', ['Program', '$'])])
     );
     const queue: State[] = [
       {
@@ -694,9 +688,9 @@ export function semanticEntry() {
     TOKEN.BOOL
   ]);
 
-  Object.entries(production2key).forEach(([production, index]) => {
-    const [l, r] = production.split("->");
-    parser.add_rule(l, r.split(" "), index);
+  production2key.forEach((production, index) => {
+    const [l, r] = production.split(':');
+    parser.add_rule(l, r.trim().split(' '), index);
   });
 
   parser.get_dfa(false, false);

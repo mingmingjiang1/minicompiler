@@ -38,10 +38,12 @@ function funcIsExisted(
   const targets = functionMap.get(name) || [];
   // const { returnType, formalsType, f } = target;
   const isR = targets.some((target, index) => {
-    return target.returnType === func.return_type &&
+    return (
+      target.returnType === func.return_type &&
       target.formalsType.every(
         (formal, index) => formal.type === func.formal_list[index].type
-      );
+      )
+    );
   });
   if (isR) {
     throw new Error(errorMsg(`Duplicate function signature: ${func.name}`));
@@ -72,7 +74,6 @@ const scopes: Scope = {
 export function semanticCheck(ast: Program_Class) {
   let cur = ast.expr as Function_Class;
   while (cur) {
-
     if (!funcIsExisted(cur, FunctionMap, cur.name)) {
       if (!FunctionMap.get(cur.name)) {
         FunctionMap.set(cur.name, []);
@@ -114,6 +115,20 @@ function checkMain() {
   }
 }
 
+function checkFormals(
+  expr: Formal_Class,
+  formal_list: { type: string; id: string }[]
+) {
+  // check same formals exsisted or not
+  if (new Set(formal_list.map(formal => formal.id)).size !== formal_list.length) {
+    throw new Error(
+      errorMsg(
+        `Can't declare same formals`
+      )
+    );
+  }
+}
+
 function checkMeta(
   expr: Expression_Class,
   scope: Scope,
@@ -134,7 +149,11 @@ function checkMeta(
       target = formal_list.find((formal) => formal.id === expr.token);
     }
     if (!target) {
-      throw new Error(errorMsg(`The variable ${expr.token} is not found, please declare it first!`));
+      throw new Error(
+        errorMsg(
+          `The variable ${expr.token} is not found, please declare it first!`
+        )
+      );
     }
     return target.type;
   } else if (expr instanceof Int_Contant_Class) {
@@ -165,7 +184,9 @@ function checkArigthm(
   const t2 = checkMeta(e2, scope, formal_list);
   if (t1 !== t2) {
     throw new Error(
-      errorMsg(`Type '${t1}' is incompatible with type '${t2}', both should are int type`)
+      errorMsg(
+        `Type '${t1}' is incompatible with type '${t2}', both should are int type`
+      )
     );
   }
   return t1;
@@ -182,7 +203,9 @@ function checkCond(
   const t2 = checkMeta(e2, scope, formal_list);
   if (t1 !== t2) {
     throw new Error(
-      errorMsg(`Type '${t1}' is incompatible with type '${t2}', both should are int type`)
+      errorMsg(
+        `Type '${t1}' is incompatible with type '${t2}', both should are int type`
+      )
     );
   }
   return "bool";
@@ -193,7 +216,7 @@ function checkCaller(
   scope: Scope,
   formal_list: { type: string; id: string }[]
 ) {
-  if (expr.id === 'main') {
+  if (expr.id === "main") {
     throw new Error(errorMsg("Main function can't been call"));
   }
 
@@ -204,7 +227,10 @@ function checkCaller(
   }
 
   let { params } = expr;
-  if (expr.id === 'print' && expr.params_list.length >= 2 || !expr.params_list.length) {
+  if (
+    expr.id === "print" &&
+    (expr.params_list.length >= 2 || !expr.params_list.length)
+  ) {
     throw new Error(errorMsg("There must be only one param in print function"));
   }
 
@@ -225,7 +251,9 @@ function checkCaller(
   }
 
   throw new Error(
-    errorMsg(`There is no suitable function signature for ${expr.id}, check the function name, parameter type, and return type`)
+    errorMsg(
+      `There is no suitable function signature for ${expr.id}, check the function name, parameter type, and return type`
+    )
   );
 }
 
@@ -253,31 +281,31 @@ function checkBranch(
   let { statementFalse, statementTrue } = expr;
   const { ifCond } = expr;
   checkCond(ifCond, ifCond.lExpr, ifCond.rExpr, scope, formal_list);
-  const scopeTrue: Scope = {
-    scope: [],
-    next: [],
-    parent: scope,
-  };
-  const scopeFalse: Scope = {
-    scope: [],
-    next: [],
-    parent: scope,
-  };
-  scope.next.push(scopeTrue, scopeFalse);
+  // const scopeTrue: Scope = {
+  //   scope: [],
+  //   next: [],
+  //   parent: scope,
+  // };
+  // const scopeFalse: Scope = {
+  //   scope: [],
+  //   next: [],
+  //   parent: scope,
+  // };
+  // scope.next.push(scopeTrue, scopeFalse);
   let returnFlag1, returnFlag2;
 
   while (statementTrue) {
     if (statementTrue instanceof Declare_Class) {
       throw new Error(errorMsg("Cant't declare block variable"));
     }
-    returnFlag1 = switchTest(statementTrue, scopeTrue, formal_list, return_type);
+    returnFlag1 = switchTest(statementTrue, scope, formal_list, return_type);
     statementTrue = statementTrue.next;
   }
   while (statementFalse) {
     if (statementFalse instanceof Declare_Class) {
       throw new Error(errorMsg("Cant't declare block variable"));
     }
-    returnFlag2 = switchTest(statementFalse, scopeFalse, formal_list, return_type);
+    returnFlag2 = switchTest(statementFalse, scope, formal_list, return_type);
     statementFalse = statementFalse.next;
   }
 
@@ -301,12 +329,18 @@ function checkAssign(
     target = scope.scope.find((item) => item.name === name.token);
   }
   if (!target) {
-    throw new Error(errorMsg(`The variable ${name.token} is not found, please declare it first!`));
+    throw new Error(
+      errorMsg(
+        `The variable ${name.token} is not found, please declare it first!`
+      )
+    );
   }
   const actualType = target.type;
   const type = switchTest(r, scope, formal_list);
   if (actualType !== type) {
-    throw new Error(errorMsg(`Type '${actualType}' is not assignable to type '${type}'.`));
+    throw new Error(
+      errorMsg(`Type '${actualType}' is not assignable to type '${type}'.`)
+    );
   }
 }
 
@@ -331,7 +365,9 @@ function checkDeclare(
   const type = switchTest(r, scope, formal_list);
 
   if (ltype !== type) {
-    throw new Error(errorMsg(`Type '${type}' is not assignable to type '${ltype}'.`));
+    throw new Error(
+      errorMsg(`Type '${type}' is not assignable to type '${ltype}'.`)
+    );
   }
 
   // push var into cur scope;
@@ -353,7 +389,12 @@ function switchTest(
     return checkCaller(expr, scope, formal_list);
   } else if (expr instanceof Cond_Class) {
     return checkCond(expr, expr.lExpr, expr.rExpr, scope, formal_list);
-  } else if (expr instanceof Add_Class || expr instanceof Sub_Class || expr instanceof Div_Class || expr instanceof Mul_Class) {
+  } else if (
+    expr instanceof Add_Class ||
+    expr instanceof Sub_Class ||
+    expr instanceof Div_Class ||
+    expr instanceof Mul_Class
+  ) {
     const { lvalue, rvalue } = expr;
     return checkArigthm(expr, lvalue, rvalue, scope, formal_list);
   } else if (
@@ -368,9 +409,11 @@ function switchTest(
     return checkReturn(expr, scope, formal_list, return_type);
   } else if (expr instanceof Assign_Class) {
     checkAssign(expr, scope, formal_list);
-  }
+  } 
+  // else if (expr instanceof Formal_Class) {
+  //   checkFormals(expr, formal_list);
+  // }
 }
-
 
 function checkFunc(f: Function_Class) {
   // function scope
@@ -392,7 +435,9 @@ function checkFunc(f: Function_Class) {
 
     expressions = expressions.next;
   }
-    if (!hasReturn && return_type !== "void" && f.name !== "main")
-    throw new Error(errorMsg(`Type 'void' is not assignable to type '${return_type}'.`));
+  if (!hasReturn && return_type !== "void" && f.name !== "main")
+    throw new Error(
+      errorMsg(`Type 'void' is not assignable to type '${return_type}'.`)
+    );
 }
 // Duplicate function implementation

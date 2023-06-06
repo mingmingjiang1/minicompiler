@@ -266,23 +266,7 @@ function cgenForIDDeclartion(
   let res = "";
   // declare id in text area
   const r = assign.r;
-
-  if (r instanceof Sub_Class) {
-    res += cgenSub(r, params, declarations); // 结果存到a0
-  } else if (r instanceof Add_Class) {
-    res += cgenAdd(r, params, declarations); // 结果存到a0
-  } else if (r instanceof Div_Class) {
-    res += cgenDiv(r, params, declarations);
-  } else if (r instanceof Mul_Class) {
-    res += cgenMul(r, params, declarations);
-  } else if (r instanceof Int_Contant_Class || r instanceof Bool_Class) {
-    res += cgenForIntContant(r); // 结果存到a0
-  } else if (r instanceof Indentifier_Class) {
-    res += cgenForID(r, params, declarations); // 结果存到a0
-  } else if (r instanceof Caller_Class) {
-    res += cgenCaller(r, params, declarations);
-  }
-  // res += switchCase(r, data, params, declarations);
+  res += switchCase(r, params, declarations);
 
   res += STORE(0); // `sw $a0, 0($29)\n`;
   res += ADDIU(-4); // `addiu $29, $29, -4\n`;
@@ -299,21 +283,8 @@ function cgenForAssign(
   // declare id in text area
   const r = assign.r; // 获取右侧赋值表达式
 
-  if (r instanceof Sub_Class) {
-    res += cgenSub(r, params, declarations); // 结果存到a0
-  } else if (r instanceof Add_Class) {
-    res += cgenAdd(r, params, declarations); // 结果存到a0
-  } else if (r instanceof Div_Class) {
-    res += cgenDiv(r, params, declarations);
-  } else if (r instanceof Mul_Class) {
-    res += cgenMul(r, params, declarations);
-  } else if (r instanceof Int_Contant_Class || r instanceof Bool_Class) {
-    res += cgenForIntContant(r); // 结果存到a0
-  } else if (r instanceof Indentifier_Class) {
-    res += cgenForID(r, params, declarations); // 结果存到a0
-  } else if (r instanceof Caller_Class) {
-    res += cgenCaller(r, params, declarations);
-  }
+  res += switchCase(r, params, declarations);
+
   let cur = declarations;
   let ans;
   let offset = 0;
@@ -408,41 +379,41 @@ export function cgenBranch(
   let children;
   let { ifCond, statementTrue, statementFalse } = e;
 
-  let cur: Scope = {
-    scope: [],
-    next: [],
-    parent,
-  };
+  // let cur: Scope = {
+  //   scope: [],
+  //   next: [],
+  //   parent,
+  // };
 
   resTrue += cgenExpressions(
     statementTrue,
     params,
-    cur,
+    parent,
     e.next ? `common${cnt1}` : label
   );
 
-  parent?.next?.push(cur);
+  // parent?.next?.push(cur);
 
   let target = findTargetEle("text", data);
   if (target) {
     children = target.children;
   }
 
-  cur = {
-    scope: [],
-    next: [],
-    parent,
-  };
+  // cur = {
+  //   scope: [],
+  //   next: [],
+  //   parent,
+  // };
 
   let resFalse = `statement_false${cnt1}:\n`;
   resFalse += cgenExpressions(
     statementFalse,
     params,
-    cur,
+    parent,
     e.next ? `common${cnt1}` : label
   );
 
-  parent.next.push(cur);
+  // parent.next.push(cur);
 
   if (target) {
     children = target.children;
@@ -475,10 +446,10 @@ export function cgenBranch(
 
   const { op, lExpr, rExpr } = ifCond;
   let res = "";
-  res += switchCase(lExpr, params);
+  res += switchCase(lExpr, params, parent); // 加载左表达式
   res += STORE(0, "$a0", "$sp");
   res += ADDIU(-4);
-  res += switchCase(rExpr, params);
+  res += switchCase(rExpr, params, parent);
   res += LOAD(4, "$t0", "$sp");
   res += ADDIU(4);
   // res += `sw $a0, 0($29)\n`;
@@ -494,7 +465,7 @@ export function cgenBranch(
       }`;
       break;
     case ">=":
-      res += `ble	$t0, $a0, statement_false${cnt1}\n`;
+      res += `blt	$t0, $a0, statement_false${cnt1}\n`;
       res += `${resTrue}${
         e.next && !hasBranch(statementTrue) ? `b common${cnt1}\n` : "\n"
       }`;
@@ -506,13 +477,13 @@ export function cgenBranch(
       }`; // 存在label说明不是最外层if-else,不存在e.next说明已经没有zi分支语句了
       break;
     case "<=":
-      res += `bge	$t0, $a0, statement_false${cnt1}\n`;
+      res += `bgt	$t0, $a0, statement_false${cnt1}\n`;
       res += `${resTrue}${
         e.next && !hasBranch(statementTrue) ? `b common${cnt1}\n` : "\n"
       }`;
       break;
     case "<":
-      res += `bgt	$t0, $a0, statement_false${cnt1}\n`;
+      res += `bge	$t0, $a0, statement_false${cnt1}\n`;
       res += `${resTrue}${
         e.next && !hasBranch(statementTrue) ? `b common${cnt1}\n` : "\n"
       }`;
@@ -527,8 +498,6 @@ export function cgenBranch(
 
   return res;
 }
-
-function cgenForFalseBranch() {}
 
 function cgenCondition(
   expr: Cond_Class,

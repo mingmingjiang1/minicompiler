@@ -73,6 +73,46 @@ Params -> Params, Expression
 Params -> Expression
 */
 
+export const ex = [
+  'E: Program $',
+  'Program: Function',
+  'Program: Program Function',
+  `Function: ${TOKEN.TYPE} ${TOKEN.ID} ( Formals ) Blocks`,
+  `Formals: ${TOKEN.TYPE} ${TOKEN.ID}`,
+  `Formals: Formals , ${TOKEN.TYPE} ${TOKEN.ID}`,
+  'Expression: Assign',
+  'Expression: Arigthm',
+  'Expression: Condition',
+  'Expression: Return',
+  `Return: ${TOKEN.KEYWORD} Expression`,
+  `Assign: ${TOKEN.TYPE} ${TOKEN.ID} ${TOKEN.ASSIGN} Expression`,
+  'Arigthm: Arigthm + Token',
+  'Arigthm: Token',
+  `Factor: ${TOKEN.BOOL}`,
+  `Factor: ${TOKEN.ID}`,
+  `Factor: ${TOKEN.NUM}`,
+  `Condition: Expression ${TOKEN.COND} Expression`,
+  `Caller: ${TOKEN.ID} ( )`,
+  `Caller: ${TOKEN.ID} ( Params )`,
+  'Params: Params , Expression',
+  'Params: Expression',
+  'Statement: Branch',
+  'Blocks: { Statements }',
+  `Branch: ${TOKEN.IF} ( Condition ) Blocks ${TOKEN.ELSE} Blocks`,
+  `Function: ${TOKEN.TYPE} ${TOKEN.ID} ( ) Blocks`,
+  'Statements: Statements Statement',
+  'Statements: Statement',
+  'Statement: Expression ;',
+  'Arigthm: Arigthm - Token',
+  'Token: Token * Factor',
+  'Token: Token / Factor',
+  'Token: Factor',
+  `Expression: ${TOKEN.ID} ${TOKEN.ASSIGN} Expression`,
+  'Factor: ( Arigthm )',
+  'Factor: Caller',
+  `Branch: ${TOKEN.IF} ( Condition ) Blocks`
+]
+
 export const test = {
   ["E" + "->" + transformRFH(['Program', '$'])]: 0,
   ['Program' + "->" + 'Function']: 1,
@@ -112,15 +152,14 @@ export const test = {
   ['Token' + "->" + transformRFH(['Token', '*', 'Factor'])]: 30,
   ['Token' + "->" + transformRFH(['Token', '/', 'Factor'])]: 31,
   ['Token' + "->" +'Factor']: 33,
-  ["Expression" + "->" + transformRFH([TOKEN.ID, TOKEN.ASSIGN, "Expression"])]: 34, // 声明式加减乘除 语句
+  ["Expression" + "->" + transformRFH([TOKEN.ID, TOKEN.ASSIGN, "Expression"])]: 34,
   ['Factor' + "->" + transformRFH(['(', 'Arigthm', ')'])]: 35,
   ['Factor' + "->" + 'Caller']: 36,
   // ['Blocks' + "->" + transformRFH(['{', 'Statements', '}', 'ElseBlock'])]: 37,
   ["Branch" + "->" + transformRFH([TOKEN.IF,  "(", "Condition", ")", "Blocks"])]: 37,
-  // ["Expression" + "->" + transformRFH([TOKEN.ID, TOKEN.ASSIGN, "Expression"])]: 38, // 声明式加减乘除 语句
 }
 
-// export const test1 = {
+// export const testExample2 = {
 //   ["E" + "->" + transformRFH(['Program', '$'])]: 0, // E
 //   ['Program' + "->" + transformRFH(['Assign', TOKEN.COND, 'Assign'])]: 1,
 //   ['Assign' + "->" + transformRFH(['Assign', '+', 'Token'])]: 2,
