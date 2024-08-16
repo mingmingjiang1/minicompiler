@@ -21,9 +21,9 @@
 
 ## Prerequste:
 
-1. spim:  `sudo-apt install spim`
+1. spim:  `sudo apt install spim`
 2. *node: support at least version 14.0.0*
-3. npm: `npm sudo-apt install npm`
+3. npm: `npm sudo apt install npm`
 
 
 

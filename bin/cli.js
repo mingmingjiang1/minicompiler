@@ -18,9 +18,8 @@ name: ${name}
 version: ${version}
   `);
 } else {
-  // shell.echo("node version: ")
-  const nodeVersion = shell.exec("echo node version: $(node -v)");
-  if (!nodeVersion.stdout.match(/14/)) {
+  const major = nodeVersion.stdout.match(/node version: v(.*)\.(.*)\.(.*)/)?.[1]
+  if (Number(major) < 14) {
       console.log(chalk.green.bold("请安装14以上的node版本"));
       shell.exit(1);
   }
@@ -33,7 +32,7 @@ version: ${version}
     shell.exit(1);
   }
 
-
+  console.log(chalk.green.bold(`编译通过✅，生成目标.s文件`));
   shell.exec(`node ${path.dirname(__dirname, "..")} ${
     process.argv[2]
   } ${shell.pwd()} > output.log`);
